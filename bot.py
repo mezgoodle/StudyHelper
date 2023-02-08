@@ -8,7 +8,7 @@ from loader import dp
 from tgbot.config import config
 from tgbot.filters.admin import IsAdminFilter
 from tgbot.middlewares.throttling import ThrottlingMiddleware
-from tgbot.models.database import create_db_and_tables, create_db_engine
+from tgbot.models.database import Database
 from tgbot.services.admins_notify import on_startup_notify
 from tgbot.services.setting_commands import set_default_commands
 
@@ -36,9 +36,8 @@ async def register_all_commands(dispatcher: Dispatcher) -> None:
 
 def create_db(dispatcher: Dispatcher):
     logger.info("Creating engine and tables in db")
-    engine = create_db_engine()
-    create_db_and_tables(engine)
-    dispatcher.bot["engine"] = engine
+    db = Database()
+    dispatcher.bot["db"] = db
 
 
 async def on_startup(dispatcher: Dispatcher, webhook_url: str = None) -> None:
