@@ -1,4 +1,4 @@
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 from loguru import logger
 from sqlalchemy.exc import CompileError
@@ -14,19 +14,44 @@ class SubjectStudentLink(SQLModel, table=True):
     )
 
 
+class SubjectTeacherLink(SQLModel, table=True):
+    subject: Optional[int] = Field(
+        default=None, foreign_key="subject.id", primary_key=True
+    )
+    teacher: Optional[int] = Field(
+        default=None, foreign_key="teacher.id", primary_key=True
+    )
+
+
 class Subject(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     name: str = Field(index=True)
-    students: List["Student"] = Relationship(
+    students: list["Student"] = Relationship(
         back_populates="subjects", link_model=SubjectStudentLink
+    )
+    teacher: Optional["Teacher"] = Relationship(
+        back_populates="subjects", link_model=SubjectTeacherLink
     )
 
 
 class Student(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     name: str
-    subjects: List[Subject] = Relationship(
+    telegram_id: int = Field(index=True)
+    group: str
+    username: str
+    subjects: list[Subject] = Relationship(
         back_populates="students", link_model=SubjectStudentLink
+    )
+
+
+class Teacher(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    name: str
+    username: str
+    telegram_id: int = Field(index=True)
+    subjects: list[Subject] = Relationship(
+        back_populates="teacher", link_model=SubjectTeacherLink
     )
 
 
@@ -36,35 +61,40 @@ class Database:
         self.engine = create_engine(sqlite_url, echo=True)
         SQLModel.metadata.create_all(self.engine)
 
-    # def create_hero(self, name: str, secret_name: str, age: int = None) -> bool:
-    #     """Method for creating hero
+    def create_teacher(
+        self, name: str, telegram_id: int, username: str
+    ) -> Optional[Teacher]:
+        """Method for creating a teacher
 
-    #     Args:
-    #         name (str): name of the hero
-    #         secret_name (str): secret name of the hero
-    #         age (int, optional): age of the hero. Defaults to None.
+        Args:
+            name (str): full-name of the teacher
+            telegram_id (int): telegram id of the teacher
+            username (str): username of the teacher
 
-    #     Returns:
-    #         bool: status of the operation
-    #     """
-    #     hero = Hero(name=name, secret_name=secret_name, age=age)
-    #     return self.__create(hero)
+        Returns:
+            Optional[Teacher]: created object
+        """
+        teacher = Teacher(name=name, telegram_id=telegram_id, username=username)
+        return self.__create(teacher)
 
-    # def __create(self, obj: Union[Hero, str]) -> bool:
-    #     """Method for creating object in the database
+    def __create(
+        self, obj: Union[Teacher, Student, Subject]
+    ) -> Optional[Union[Teacher, Student, Subject]]:
+        """Private method for creating an object
 
-    #     Args:
-    #         obj (Union[Hero, str]): instance of the table
+        Args:
+            obj (Union[Teacher, Student, Subject]): object to create
 
-    #     Returns:
-    #         bool: status of the operation
-    #     """
-    #     logger.info("Try to create an user")
-    #     with Session(self.engine) as session:
-    #         try:
-    #             session.commit()
-    #             logger.info("Successfull creation")
-    #         except CompileError as e:
-    #             logger.error(f"Error: {e}")
-    #             return False
-    #     return True
+        Returns:
+            Optional[Union[Teacher, Student, Subject]]: created object
+        """
+        logger.info("Try to create an object")
+        with Session(self.engine) as session:
+            try:
+                session.add(obj)
+                session.commit()
+                session.refresh(obj)
+                logger.info("Successfull creation")
+                return obj
+            except CompileError as e:
+                logger.error(f"Error: {e}")
