@@ -1,1 +1,1 @@
-from . import admin, user, help, state, echo, errors
+from . import admin, echo, errors, help, registration, state, user
