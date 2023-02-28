@@ -1,14 +1,15 @@
-from aiogram.types import Message
 from aiogram.dispatcher.filters import BoundFilter
+from aiogram.types import Message
+
+from tgbot.models.database import Database
 
 
-class IsAdminFilter(BoundFilter):
-    key = 'is_admin'
+class IsTeacherFilter(BoundFilter):
+    key = "is_teacher"
 
-    def __init__(self, is_admin):
-        self.is_admin = is_admin
+    def __init__(self, is_teacher):
+        self.is_teacher = is_teacher
 
     async def check(self, message: Message):
-        member = await message.bot.get_chat_member(message.chat.id, message.from_user.id)
-        return member.is_chat_admin()
-
+        db: Database = message.bot.get("db")
+        return db.is_teacher(message.from_user.id)

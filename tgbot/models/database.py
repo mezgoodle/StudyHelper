@@ -1,8 +1,8 @@
 from typing import Optional, Union
 
 from loguru import logger
-from sqlalchemy.exc import CompileError
-from sqlmodel import Field, Relationship, Session, SQLModel, create_engine
+from sqlalchemy.exc import CompileError, MultipleResultsFound
+from sqlmodel import Field, Relationship, Session, SQLModel, create_engine, select
 
 
 class SubjectStudentLink(SQLModel, table=True):
@@ -76,6 +76,32 @@ class Database:
         """
         teacher = Teacher(name=name, telegram_id=telegram_id, username=username)
         return self.__create(teacher)
+
+    def get_teacher(self, telegram_id: int) -> Optional[Teacher]:
+        """Method for getting a teacher by telegram id
+
+        Args:
+            telegram_id (int): telegram id of the teacher
+
+        Returns:
+            Optional[Teacher]: teacher object
+        """
+        with Session(self.engine) as session:
+            teacher = session.exec(
+                select(Teacher).where(Teacher.telegram_id == telegram_id)
+            ).first()
+            return teacher
+
+    def is_teacher(self, telegram_id: int) -> bool:
+        """Method for checking if a user is a teacher
+
+        Args:
+            telegram_id (int): telegram id of the user
+
+        Returns:
+            bool: True if user is a teacher, False otherwise
+        """
+        return self.get_teacher(telegram_id) is not None
 
     def __create(
         self, obj: Union[Teacher, Student, Subject]
