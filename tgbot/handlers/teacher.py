@@ -4,7 +4,7 @@ from aiogram.types import ContentTypes, Message
 
 from loader import dp
 from tgbot.misc.import_students import parse_students_from_file
-from tgbot.misc.utils import check_extension, download_file
+from tgbot.misc.utils import check_extension, delete_file, download_file
 
 
 @dp.message_handler(Command(["add_students"]))
@@ -25,6 +25,7 @@ async def process_file(message: Message, state: FSMContext) -> Message:
             check_extension(file_name)
             downloaded_path = await download_file(file_name, message)
             parse_students_from_file(downloaded_path)
+            delete_file(downloaded_path)
         except Exception as error_message:
             return await message.answer(error_message)
         return await message.answer("Students were added")

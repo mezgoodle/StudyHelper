@@ -23,3 +23,8 @@ async def download_file(
         return path_to_download
     except Exception as error_message:
         raise Exception("Can't download file")
+
+
+def delete_file(path: Path):
+    if path.exists():
+        path.unlink()
