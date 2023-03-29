@@ -2,6 +2,8 @@ from pathlib import Path
 
 from pandas import read_csv, read_excel
 
+from tgbot.models.validation_models import ValidationModel
+
 FILE_EXTENSIONS = {
     ".csv": read_csv,
     ".xlsx": read_excel,
@@ -12,4 +14,5 @@ FILE_EXTENSIONS = {
 def parse_students_from_file(path: Path):
     extension = path.suffix
     df = FILE_EXTENSIONS.get(extension, read_csv)(path)
-    print(df)
+    df_dict = df.to_dict(orient="records")
+    ValidationModel(dataframe=df_dict)
