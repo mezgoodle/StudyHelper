@@ -1,6 +1,8 @@
+from pathlib import Path
+
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Command
-from aiogram.types import ContentTypes, Message
+from aiogram.types import ContentTypes, InputFile, Message
 
 from loader import dp
 from tgbot.misc.import_students import parse_students_from_file
@@ -10,9 +12,10 @@ from tgbot.misc.utils import check_extension, delete_file, download_file
 @dp.message_handler(Command(["add_students"]))
 async def add_students(message: Message, state: FSMContext) -> Message:
     await state.set_state("wait_for_file")
-    # TODO: send template file
+    path_to_file = Path().joinpath("files", "exports", "example.xlsx")
+    await message.answer_document(InputFile(path_to_file), caption="Example")
     return await message.answer(
-        "Send file with students' data. Formats: .csv, .xlsx, .xls"
+        "Send file with students' data as in the example. Formats: .csv, .xlsx, .xls"
     )
 
 
