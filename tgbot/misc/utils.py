@@ -19,7 +19,7 @@ async def download_file(
         path_to_download = Path().joinpath(*folders)
         path_to_download.mkdir(parents=True, exist_ok=True)
         path_to_download = path_to_download.joinpath(file_name)
-        path = await message.document.download(destination_file=path_to_download)
-        return path
+        await message.document.download(destination_file=path_to_download)
+        return path_to_download
     except Exception as error_message:
         raise Exception("Can't download file")
