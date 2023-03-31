@@ -22,7 +22,6 @@ def parse_students_from_file(path: Path, db: Database):
 
 
 def create_student(student: dict, db: Database):
-    print(student)
     _ = db.create_student(
         name=student["name"],
         username=student["username"],

@@ -1,1 +1,1 @@
-from . import echo, errors, teacher
+from . import teacher, student, echo, errors

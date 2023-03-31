@@ -97,10 +97,13 @@ class Database:
         self, obj: Union[Teacher, Student, Subject]
     ) -> Optional[Union[Teacher, Student, Subject]]:
         with Session(self.engine) as session:
-            session.add(obj)
-            session.commit()
-            session.refresh(obj)
-            return obj
+            try:
+                session.add(obj)
+                session.commit()
+                session.refresh(obj)
+                return obj
+            except CompileError as e:
+                logger.error(f"Error: {e}")
 
     def get_teacher(self, telegram_id: int) -> Optional[Teacher]:
         with Session(self.engine) as session:

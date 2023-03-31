@@ -7,6 +7,20 @@ from aiogram.types import ContentTypes, InputFile, Message
 from loader import dp
 from tgbot.misc.import_students import parse_students_from_file
 from tgbot.misc.utils import check_extension, delete_file, download_file
+from tgbot.models.database import Database
+
+
+@dp.message_handler(Command(["register_teacher"]))
+async def register_teacher(message: Message) -> Message:
+    db: Database = message.bot.get("db")
+    user = message.from_user
+    if db.get_teacher(message.from_user.id):
+        return await message.answer("You are already registered as teacher")
+    if db.create_teacher(
+        name=user.full_name, telegram_id=user.id, username=user.username
+    ):
+        return await message.answer("You are registered as teacher")
+    return await message.answer("Something went wrong")
 
 
 @dp.message_handler(Command(["add_students"]))
