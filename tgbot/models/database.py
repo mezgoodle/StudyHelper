@@ -64,56 +64,69 @@ class Database:
     def create_teacher(
         self, name: str, telegram_id: int, username: str
     ) -> Optional[Teacher]:
-        """Method for creating a teacher
-
-        Args:
-            name (str): full-name of the teacher
-            telegram_id (int): telegram id of the teacher
-            username (str): username of the teacher
-
-        Returns:
-            Optional[Teacher]: created object
-        """
         teacher = Teacher(name=name, telegram_id=telegram_id, username=username)
         return self.__create(teacher)
 
+    def create_student(
+        self, name: str, telegram_id: int, group: str, username: str, subject_name: str
+    ) -> Optional[Student]:
+        if student := self.get_student(telegram_id):
+            student.subjects.append(subject_name)
+            return self.__update(student)
+        if subject := self.get_subject(subject_name):
+            student = Student(
+                name=name,
+                telegram_id=telegram_id,
+                group=group,
+                username=username,
+                subjects=[subject],
+            )
+            return self.__create(student)
+        subject = Subject(name=subject_name)
+        self.__create(subject)
+        student = Student(
+            name=name,
+            telegram_id=telegram_id,
+            group=group,
+            username=username,
+            subjects=[subject],
+        )
+        return self.__create(student)
+
+    def __update(
+        self, obj: Union[Teacher, Student, Subject]
+    ) -> Optional[Union[Teacher, Student, Subject]]:
+        with Session(self.engine) as session:
+            session.add(obj)
+            session.commit()
+            session.refresh(obj)
+            return obj
+
     def get_teacher(self, telegram_id: int) -> Optional[Teacher]:
-        """Method for getting a teacher by telegram id
-
-        Args:
-            telegram_id (int): telegram id of the teacher
-
-        Returns:
-            Optional[Teacher]: teacher object
-        """
         with Session(self.engine) as session:
             teacher = session.exec(
                 select(Teacher).where(Teacher.telegram_id == telegram_id)
             ).first()
             return teacher
 
+    def get_student(self, telegram_id: int) -> Optional[Student]:
+        with Session(self.engine) as session:
+            student = session.exec(
+                select(Student).where(Student.telegram_id == telegram_id)
+            ).first()
+            return student
+
+    def get_subject(self, name: str) -> Optional[Subject]:
+        with Session(self.engine) as session:
+            subject = session.exec(select(Subject).where(Subject.name == name)).first()
+            return subject
+
     def is_teacher(self, telegram_id: int) -> bool:
-        """Method for checking if a user is a teacher
-
-        Args:
-            telegram_id (int): telegram id of the user
-
-        Returns:
-            bool: True if user is a teacher, False otherwise
-        """
         return self.get_teacher(telegram_id) is not None
 
     def __create(
         self, obj: Union[Teacher, Student, Subject]
     ) -> Optional[Union[Teacher, Student, Subject]]:
-        """Private method for creating an object
-
-        Args:
-            obj (Union[Teacher, Student, Subject]): object to create
-
-        Returns:
-            Optional[Union[Teacher, Student, Subject]]: created object
-        """
         logger.info("Try to create an object")
         with Session(self.engine) as session:
             try:

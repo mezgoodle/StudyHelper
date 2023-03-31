@@ -27,7 +27,8 @@ async def process_file(message: Message, state: FSMContext) -> Message:
             file_name = message.document.file_name
             check_extension(file_name)
             downloaded_path = await download_file(file_name, message)
-            parse_students_from_file(downloaded_path)
+            db = message.bot.get("db")
+            parse_students_from_file(downloaded_path, db)
             delete_file(downloaded_path)
         except Exception as error_message:
             return await message.answer(error_message)
