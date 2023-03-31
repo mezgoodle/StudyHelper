@@ -42,11 +42,11 @@ async def process_file(message: Message, state: FSMContext) -> Message:
             check_extension(file_name)
             downloaded_path = await download_file(file_name, message)
             db = message.bot.get("db")
-            parse_students_from_file(downloaded_path, db)
+            number_of_students = parse_students_from_file(downloaded_path, db)
             delete_file(downloaded_path)
         except Exception as error_message:
             return await message.answer(error_message)
-        return await message.answer("Students were added")
+        return await message.answer(f"{number_of_students} students were added.")
     return await message.answer(
         "You should send file with students' data. Formats: .csv, .xlsx, .xls"
     )

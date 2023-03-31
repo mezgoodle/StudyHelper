@@ -12,13 +12,14 @@ FILE_EXTENSIONS = {
 }
 
 
-def parse_students_from_file(path: Path, db: Database):
+def parse_students_from_file(path: Path, db: Database) -> int:
     extension = path.suffix
     df = FILE_EXTENSIONS.get(extension, read_csv)(path)
     df_dict = df.to_dict(orient="records")
     ValidationModel(dataframe=df_dict)
     for student in df_dict:
         create_student(student, db)
+    return len(df_dict)
 
 
 def create_student(student: dict, db: Database):
