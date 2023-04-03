@@ -1,7 +1,7 @@
 from typing import Optional, Union
 
 from loguru import logger
-from sqlalchemy.exc import CompileError, MultipleResultsFound
+from sqlalchemy.exc import CompileError
 from sqlmodel import Field, Relationship, Session, SQLModel, create_engine, select
 
 
