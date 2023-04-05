@@ -1,7 +1,7 @@
 import os
 
 from aiogram import Dispatcher
-from aiogram.utils.executor import start_polling, start_webhook
+from aiogram.utils.executor import start_polling, start_webhook  # noqa: F401
 from loguru import logger
 
 from loader import dp
@@ -24,7 +24,7 @@ def register_all_filters(dispatcher: Dispatcher) -> None:
 
 
 def register_all_handlers(dispatcher: Dispatcher) -> None:
-    from tgbot import handlers
+    from tgbot import handlers  # noqa: F401
 
     logger.info("Registering handlers")
 

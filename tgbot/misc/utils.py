@@ -8,7 +8,8 @@ def check_extension(
 ):
     if not file_name.lower().endswith(allowed_extensions):
         raise Exception(
-            "You should send file with students' data. Formats: <b>.csv</b>, <b>.xlsx</b>, <b>.xls</b>"
+            """You should send file with students' data. 
+Formats: <b>.csv</b>, <b>.xlsx</b>, <b>.xls</b>"""
         )
 
 
@@ -21,7 +22,7 @@ async def download_file(
         path_to_download = path_to_download.joinpath(file_name)
         await message.document.download(destination_file=path_to_download)
         return path_to_download
-    except Exception as error_message:
+    except Exception:
         raise Exception("Can't download file")
 
 
