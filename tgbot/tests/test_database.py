@@ -88,12 +88,20 @@ class TestSimpleQueries:
     #     valid_article = Article(
     #         slug="sample-slug",
     #         title="Title of the Valid Article",
-    #         content="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+    #         content="Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+    # sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+    # Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
+    # nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
+    # reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+    #  Excepteur sint occaecat cupidatat non proident,
+    # sunt in culpa qui officia deserunt mollit anim id est laborum.",
     #         author=valid_author,
     #     )
     #     db_session.add(valid_article)
     #     db_session.commit()
-    #     sample_article = db_session.query(Article).filter_by(slug="sample-slug").first()
+    #     sample_article = db_session.query(Article).filter_by(
+    # slug="sample-slug"
+    # ).first()
     #     assert sample_article.title == "Title of the Valid Article"
     #     assert len(sample_article.content.split(" ")) > 50
 
