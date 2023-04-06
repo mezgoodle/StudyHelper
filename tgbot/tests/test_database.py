@@ -69,8 +69,8 @@ class TestSimpleQueries:
         assert student.group == "A"
 
     def test_get_subject(self, subject: dict, db: Database):
-        subject = db.get_subject(subject.get("name"))
-        assert subject is None
+        db_subject = db.get_subject(subject.get("name"))
+        assert db_subject.name == "Math"
 
     def test_is_teacher(self, teacher: dict, db: Database):
         assert db.is_teacher(teacher.get("telegram_id")) is True
