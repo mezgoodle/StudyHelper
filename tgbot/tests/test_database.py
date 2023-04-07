@@ -6,8 +6,7 @@ from tgbot.models.database import Database, Student, Teacher
 
 @pytest.fixture(name="db")
 def db_fixture():
-    db = Database()
-    return db
+    return Database()
 
 
 @pytest.fixture(name="session")
@@ -17,7 +16,7 @@ def session_fixture(db: Database):
 
 
 @pytest.fixture(name="student")
-def valid_student():
+def student_fixture():
     return {
         "name": "John",
         "telegram_id": 123456789,
@@ -28,12 +27,12 @@ def valid_student():
 
 
 @pytest.fixture(name="subject")
-def valid_subject():
+def subject_fixture():
     return {"name": "Math"}
 
 
 @pytest.fixture(name="teacher")
-def valid_teacher():
+def teacher_fixture():
     return {
         "name": "John",
         "telegram_id": 123456789,
