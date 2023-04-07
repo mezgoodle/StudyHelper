@@ -30,4 +30,4 @@ jobs:
           ruff .
       - name: Test with pytest
         run: |
-          pytest
+          pytest -rA
