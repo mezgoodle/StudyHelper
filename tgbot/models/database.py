@@ -127,6 +127,9 @@ class Database:
     def is_teacher(self, telegram_id: int) -> bool:
         return self.get_teacher(telegram_id) is not None
 
+    def is_student(self, telegram_id: int) -> bool:
+        return self.get_student(telegram_id) is not None
+
     def __create(
         self, obj: Union[Teacher, Student, Subject]
     ) -> Optional[Union[Teacher, Student, Subject]]:

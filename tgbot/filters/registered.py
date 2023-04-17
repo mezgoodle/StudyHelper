@@ -13,3 +13,14 @@ class IsTeacherFilter(BoundFilter):
     async def check(self, message: Message):
         db: Database = message.bot.get("db")
         return db.is_teacher(message.from_user.id)
+
+
+class IsStudentFilter(BoundFilter):
+    key = "is_student"
+
+    def __init__(self, is_student):
+        self.is_student = is_student
+
+    async def check(self, message: Message):
+        db: Database = message.bot.get("db")
+        return db.is_student(message.from_user.id)

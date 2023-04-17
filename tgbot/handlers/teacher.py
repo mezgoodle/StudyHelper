@@ -23,6 +23,11 @@ async def register_teacher(message: Message) -> Message:
     return await message.answer("Something went wrong")
 
 
+@dp.message_handler(Command(["is_teacher"]), is_teacher=True)
+async def is_teacher(message: Message) -> Message:
+    return await message.answer("Hi, teacher!")
+
+
 @dp.message_handler(Command(["add_students"]))
 async def add_students(message: Message, state: FSMContext) -> Message:
     await state.set_state("wait_for_file")
