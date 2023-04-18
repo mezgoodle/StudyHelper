@@ -82,16 +82,11 @@ class Database:
                 subjects=[subject],
             )
             return self.__create(student)
-        subject = Subject(name=subject_name)
-        self.__create(subject)
-        student = Student(
-            name=name,
-            telegram_id=telegram_id,
-            group=group,
-            username=username,
-            subjects=[subject],
-        )
-        return self.__create(student)
+
+    def create_subject(self, name: str, teacher_telegram_id: int) -> Optional[Subject]:
+        teacher = self.get_teacher(teacher_telegram_id)
+        subject = Subject(name=name, teacher=[teacher])
+        return self.__create(subject)
 
     def __update(
         self, obj: Union[Teacher, Student, Subject]

@@ -3,6 +3,7 @@ from pathlib import Path
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters import Command
 from aiogram.types import ContentTypes, InputFile, Message
+from aiogram.utils.markdown import hbold
 
 from loader import dp
 from tgbot.misc.import_students import parse_students_from_file
@@ -26,6 +27,21 @@ async def register_teacher(message: Message) -> Message:
 @dp.message_handler(Command(["is_teacher"]), is_teacher=True)
 async def is_teacher(message: Message) -> Message:
     return await message.answer("Hi, teacher!")
+
+
+@dp.message_handler(Command(["add_subject"]), is_teacher=True)
+async def add_subject(message: Message, state: FSMContext) -> Message:
+    await state.set_state("subject_name")
+    return await message.answer("Send subject name")
+
+
+@dp.message_handler(state="subject_name")
+async def answer_subject_name(message: Message, state: FSMContext) -> Message:
+    await state.finish()
+    db: Database = message.bot.get("db")
+    if db.create_subject(message.text, message.from_user.id):
+        return await message.answer(f"Subject {hbold(message.text)} was added")
+    return await message.answer(f"Subject {message.text} already exists")
 
 
 @dp.message_handler(Command(["add_students"]))

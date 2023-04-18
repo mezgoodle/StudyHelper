@@ -1,7 +1,7 @@
 import pytest
 from sqlmodel import Session
 
-from tgbot.models.database import Database, Student, Teacher
+from tgbot.models.database import Database, Student, Subject, Teacher
 
 
 @pytest.fixture(name="db")
@@ -28,7 +28,7 @@ def student_fixture():
 
 @pytest.fixture(name="subject")
 def subject_fixture():
-    return {"name": "Math"}
+    return {"name": "Math", "teacher_telegram_id": 123456789}
 
 
 @pytest.fixture(name="teacher")
@@ -41,19 +41,24 @@ def teacher_fixture():
 
 
 class TestSimpleQueries:
-    def test_create_student(self, session: Session, student: dict, db: Database):
-        db.create_student(**student)
-        db_student = session.query(Student).filter_by(name="John").first()
-        assert db_student.name == student.get("name")
-        assert db_student.telegram_id == student.get("telegram_id")
-        assert db_student.group == student.get("group")
-
     def test_create_teacher(self, session: Session, teacher: dict, db: Database):
         db.create_teacher(**teacher)
         db_teacher = session.query(Teacher).filter_by(name="John").first()
         assert db_teacher.name == teacher.get("name")
         assert db_teacher.telegram_id == teacher.get("telegram_id")
         assert db_teacher.username == teacher.get("username")
+
+    def test_create_subject(self, session: Session, subject: dict, db: Database):
+        db.create_subject(**subject)
+        db_subject = session.query(Subject).filter_by(name="Math").first()
+        assert db_subject.name == subject.get("name")
+
+    def test_create_student(self, session: Session, student: dict, db: Database):
+        db.create_student(**student)
+        db_student = session.query(Student).filter_by(name="John").first()
+        assert db_student.name == student.get("name")
+        assert db_student.telegram_id == student.get("telegram_id")
+        assert db_student.group == student.get("group")
 
     def test_get_teacher(self, teacher: dict, db: Database):
         teacher = db.get_teacher(teacher.get("telegram_id"))
