@@ -145,7 +145,7 @@ class Database:
         with Session(self.engine) as session:
             try:
                 if condition is None:
-                    results = session.exec(select(obj))
+                    results = session.exec(select(obj)).all()
                 else:
                     results = session.exec(
                         select(obj).where(condition[0] == condition[1])
