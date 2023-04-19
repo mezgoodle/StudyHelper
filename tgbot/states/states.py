@@ -1,5 +1,6 @@
-from aiogram.dispatcher.filters.state import StatesGroup, State
+from aiogram.dispatcher.filters.state import State, StatesGroup
 
 
-class Example(StatesGroup):
-    example = State()
+class Student(StatesGroup):
+    group = State()
+    subject = State()
