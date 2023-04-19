@@ -88,36 +88,14 @@ class Database:
         subject = Subject(name=name, teacher=[teacher])
         return self.__create(subject)
 
-    def __update(
-        self, obj: Union[Teacher, Student, Subject]
-    ) -> Optional[Union[Teacher, Student, Subject]]:
-        with Session(self.engine) as session:
-            try:
-                session.add(obj)
-                session.commit()
-                session.refresh(obj)
-                return obj
-            except CompileError as e:
-                logger.error(f"Error: {e}")
-
     def get_teacher(self, telegram_id: int) -> Optional[Teacher]:
-        with Session(self.engine) as session:
-            teacher = session.exec(
-                select(Teacher).where(Teacher.telegram_id == telegram_id)
-            ).first()
-            return teacher
+        return self.__get(Teacher, condition=(Teacher.telegram_id, telegram_id))
 
     def get_student(self, telegram_id: int) -> Optional[Student]:
-        with Session(self.engine) as session:
-            student = session.exec(
-                select(Student).where(Student.telegram_id == telegram_id)
-            ).first()
-            return student
+        return self.__get(Student, condition=(Student.telegram_id, telegram_id))
 
     def get_subject(self, name: str) -> Optional[Subject]:
-        with Session(self.engine) as session:
-            subject = session.exec(select(Subject).where(Subject.name == name)).first()
-            return subject
+        return self.__get(Subject, condition=(Subject.name, name))
 
     def is_teacher(self, telegram_id: int) -> bool:
         return self.get_teacher(telegram_id) is not None
@@ -136,5 +114,34 @@ class Database:
                 session.refresh(obj)
                 logger.info("Successfull creation")
                 return obj
+            except CompileError as e:
+                logger.error(f"Error: {e}")
+
+    def __update(
+        self, obj: Union[Teacher, Student, Subject]
+    ) -> Optional[Union[Teacher, Student, Subject]]:
+        with Session(self.engine) as session:
+            try:
+                session.add(obj)
+                session.commit()
+                session.refresh(obj)
+                return obj
+            except CompileError as e:
+                logger.error(f"Error: {e}")
+
+    def __get(
+        self, obj: Union[Teacher, Student, Subject], condition: tuple = None
+    ) -> Optional[Union[Teacher, Student, Subject]]:
+        logger.info("Try to get an object")
+        with Session(self.engine) as session:
+            try:
+                if condition is None:
+                    results = session.exec(select(obj))
+                else:
+                    results = session.exec(
+                        select(obj).where(condition[0] == condition[1])
+                    ).first()
+                logger.info("Successfull get")
+                return results
             except CompileError as e:
                 logger.error(f"Error: {e}")
