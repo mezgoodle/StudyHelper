@@ -82,6 +82,7 @@ class Database:
                 subjects=[subject],
             )
             return self.__create(student)
+        raise ValueError("Subject is not created")
 
     def create_subject(self, name: str, teacher_telegram_id: int) -> Optional[Subject]:
         teacher = self.get_teacher(teacher_telegram_id)
