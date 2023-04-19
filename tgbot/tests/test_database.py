@@ -60,17 +60,35 @@ class TestSimpleQueries:
         assert db_student.telegram_id == student.get("telegram_id")
         assert db_student.group == student.get("group")
 
+    def test_get_teachers(self, db: Database):
+        teachers = db.get_teachers()
+        assert len(teachers) == 1
+        assert isinstance(teachers[0], Teacher)
+        assert teachers[0].name == "John"
+
     def test_get_teacher(self, teacher: dict, db: Database):
         teacher = db.get_teacher(teacher.get("telegram_id"))
         assert teacher.name == "John"
         assert teacher.telegram_id == 123456789
         assert teacher.username == "john_doe"
 
+    def test_get_students(self, db: Database):
+        students = db.get_students()
+        assert len(students) == 1
+        assert isinstance(students[0], Student)
+        assert students[0].name == "John"
+
     def test_get_student(self, student: dict, db: Database):
         student = db.get_student(student.get("telegram_id"))
         assert student.name == "John"
         assert student.telegram_id == 123456789
         assert student.group == "A"
+
+    def test_get_subjects(self, db: Database):
+        subjects = db.get_subjects()
+        assert len(subjects) == 1
+        assert isinstance(subjects[0], Subject)
+        assert subjects[0].name == "Math"
 
     def test_get_subject(self, subject: dict, db: Database):
         db_subject = db.get_subject(subject.get("name"))

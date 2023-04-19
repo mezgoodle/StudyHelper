@@ -91,11 +91,20 @@ class Database:
     def get_teacher(self, telegram_id: int) -> Optional[Teacher]:
         return self.__get(Teacher, condition=(Teacher.telegram_id, telegram_id))
 
+    def get_teachers(self) -> list[Teacher]:
+        return self.__get(Teacher)
+
     def get_student(self, telegram_id: int) -> Optional[Student]:
         return self.__get(Student, condition=(Student.telegram_id, telegram_id))
 
+    def get_students(self) -> list[Student]:
+        return self.__get(Student)
+
     def get_subject(self, name: str) -> Optional[Subject]:
         return self.__get(Subject, condition=(Subject.name, name))
+
+    def get_subjects(self) -> list[Subject]:
+        return self.__get(Subject)
 
     def is_teacher(self, telegram_id: int) -> bool:
         return self.get_teacher(telegram_id) is not None
