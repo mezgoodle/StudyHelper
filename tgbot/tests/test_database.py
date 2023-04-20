@@ -73,13 +73,18 @@ class TestSimpleQueries:
         assert teacher.username == "john_doe"
 
     def test_get_students(self, db: Database):
-        students = db.get_students()
-        assert len(students) == 1
-        assert isinstance(students[0], Student)
-        assert students[0].name == "John"
+        results = db.get_students()
+        assert len(results) == 1
+        student, subject = results[0]
+        assert isinstance(student, Student)
+        assert student.name == "John"
+        assert isinstance(subject, Subject)
+        assert subject.name == "Math"
 
     def test_get_student(self, student: dict, db: Database):
-        student = db.get_student(student.get("telegram_id"))
+        student, subject = db.get_student(
+            student.get("telegram_id"), student.get("group")
+        )
         assert student.name == "John"
         assert student.telegram_id == 123456789
         assert student.group == "A"
@@ -96,6 +101,9 @@ class TestSimpleQueries:
 
     def test_is_teacher(self, teacher: dict, db: Database):
         assert db.is_teacher(teacher.get("telegram_id")) is True
+
+    def test_is_student(self, student: dict, db: Database):
+        assert db.is_student(student.get("telegram_id"), student.get("group")) is True
 
     # @pytest.mark.xfail(raises=IntegrityError)
     # def test_author_no_email(self, db_session):

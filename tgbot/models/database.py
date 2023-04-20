@@ -1,4 +1,4 @@
-from typing import Optional, Union
+from typing import List, NewType, Optional, Tuple, Union
 
 from loguru import logger
 from sqlalchemy.exc import CompileError
@@ -55,6 +55,11 @@ class Teacher(SQLModel, table=True):
     )
 
 
+LIST_OF_OBJECTS_TYPE = NewType(
+    "LIST_OF_OBJECTS", List[Union[Subject, Student, Teacher]]
+)
+
+
 class Database:
     def __init__(self, sqlite_file_name: str = "database.db"):
         sqlite_url = f"sqlite:///{sqlite_file_name}"
@@ -70,7 +75,7 @@ class Database:
     def create_student(
         self, name: str, telegram_id: int, group: str, username: str, subject_name: str
     ) -> Optional[Student]:
-        if student := self.get_student(telegram_id):
+        if student := self.get_student(telegram_id, group):
             student.subjects.append(subject_name)
             return self.__update(student)
         if subject := self.get_subject(subject_name):
@@ -90,28 +95,36 @@ class Database:
         return self.__create(subject)
 
     def get_teacher(self, telegram_id: int) -> Optional[Teacher]:
-        return self.__get(Teacher, condition=(Teacher.telegram_id, telegram_id))
+        return self.__get([Teacher], conditions=(Teacher.telegram_id == telegram_id,))
 
-    def get_teachers(self) -> list[Teacher]:
-        return self.__get(Teacher)
+    def get_teachers(self) -> Optional[list[Teacher]]:
+        return self.__get([Teacher])
 
-    def get_student(self, telegram_id: int) -> Optional[Student]:
-        return self.__get(Student, condition=(Student.telegram_id, telegram_id))
+    def get_student(
+        self, telegram_id: int, group_name: str
+    ) -> Optional[Tuple[Student, Subject]]:
+        return self.__get(
+            [Student, Subject],
+            conditions=(
+                Student.telegram_id == telegram_id,
+                Student.group == group_name,
+            ),
+        )
 
-    def get_students(self) -> list[Student]:
-        return self.__get(Student)
+    def get_students(self) -> Optional[list[Tuple[Student, Subject]]]:
+        return self.__get([Student, Subject])
 
     def get_subject(self, name: str) -> Optional[Subject]:
-        return self.__get(Subject, condition=(Subject.name, name))
+        return self.__get([Subject], conditions=(Subject.name == name,))
 
-    def get_subjects(self) -> list[Subject]:
-        return self.__get(Subject)
+    def get_subjects(self) -> Optional[list[Subject]]:
+        return self.__get([Subject])
 
     def is_teacher(self, telegram_id: int) -> bool:
         return self.get_teacher(telegram_id) is not None
 
-    def is_student(self, telegram_id: int) -> bool:
-        return self.get_student(telegram_id) is not None
+    def is_student(self, telegram_id: int, group_name: str) -> bool:
+        return self.get_student(telegram_id, group_name) is not None
 
     def __create(
         self, obj: Union[Teacher, Student, Subject]
@@ -140,17 +153,15 @@ class Database:
                 logger.error(f"Error: {e}")
 
     def __get(
-        self, obj: Union[Teacher, Student, Subject], condition: tuple = None
-    ) -> Optional[Union[Teacher, Student, Subject]]:
+        self, objects: list[Union[Teacher, Student, Subject]], conditions: tuple = None
+    ) -> Optional[LIST_OF_OBJECTS_TYPE]:
         logger.info("Try to get an object")
         with Session(self.engine) as session:
             try:
-                if condition is None:
-                    results = session.exec(select(obj)).all()
+                if conditions is None:
+                    results = session.exec(select(*objects)).all()
                 else:
-                    results = session.exec(
-                        select(obj).where(condition[0] == condition[1])
-                    ).first()
+                    results = session.exec(select(*objects).where(*conditions)).first()
                 logger.info("Successfull get")
                 return results
             except CompileError as e:
