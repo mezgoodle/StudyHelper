@@ -26,16 +26,21 @@ async def process_group(message: Message, state: FSMContext) -> Message:
 
 @dp.message_handler(state=Student.subject)
 async def process_subject(message: Message, state: FSMContext) -> Message:
+    data = await state.get_data()
     await state.finish()
     db: Database = message.bot.get("db")
     user = message.from_user
-    if db.get_student(message.from_user.id):
-        return await message.answer("You are already registered as student")
+    if db.get_student(user.id, message.text):
+        return await message.answer(
+            "You are already registered as student for this subject"
+        )
+
     if db.create_student(
         name=user.full_name,
         telegram_id=user.id,
         username=user.username,
-        group=message.text,
+        group=data["group"],
+        subject_name=message.text,
     ):
-        return await message.answer("You are registered as student")
+        return await message.answer("You are registered as student for this subject")
     return await message.answer("Something went wrong")
