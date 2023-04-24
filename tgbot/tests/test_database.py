@@ -1,7 +1,7 @@
 import pytest
 from sqlmodel import Session
 
-from tgbot.models.database import Database, Student, Teacher
+from tgbot.models.database import Database, Student, Subject, Teacher
 
 
 @pytest.fixture(name="db")
@@ -28,7 +28,7 @@ def student_fixture():
 
 @pytest.fixture(name="subject")
 def subject_fixture():
-    return {"name": "Math"}
+    return {"name": "Math", "teacher_telegram_id": 123456789}
 
 
 @pytest.fixture(name="teacher")
@@ -41,13 +41,6 @@ def teacher_fixture():
 
 
 class TestSimpleQueries:
-    def test_create_student(self, session: Session, student: dict, db: Database):
-        db.create_student(**student)
-        db_student = session.query(Student).filter_by(name="John").first()
-        assert db_student.name == student.get("name")
-        assert db_student.telegram_id == student.get("telegram_id")
-        assert db_student.group == student.get("group")
-
     def test_create_teacher(self, session: Session, teacher: dict, db: Database):
         db.create_teacher(**teacher)
         db_teacher = session.query(Teacher).filter_by(name="John").first()
@@ -55,17 +48,52 @@ class TestSimpleQueries:
         assert db_teacher.telegram_id == teacher.get("telegram_id")
         assert db_teacher.username == teacher.get("username")
 
+    def test_create_subject(self, session: Session, subject: dict, db: Database):
+        db.create_subject(**subject)
+        db_subject = session.query(Subject).filter_by(name="Math").first()
+        assert db_subject.name == subject.get("name")
+
+    def test_create_student(self, session: Session, student: dict, db: Database):
+        db.create_student(**student)
+        db_student = session.query(Student).filter_by(name="John").first()
+        assert db_student.name == student.get("name")
+        assert db_student.telegram_id == student.get("telegram_id")
+        assert db_student.group == student.get("group")
+
+    def test_get_teachers(self, db: Database):
+        teachers = db.get_teachers()
+        assert len(teachers) == 1
+        assert isinstance(teachers[0], Teacher)
+        assert teachers[0].name == "John"
+
     def test_get_teacher(self, teacher: dict, db: Database):
         teacher = db.get_teacher(teacher.get("telegram_id"))
         assert teacher.name == "John"
         assert teacher.telegram_id == 123456789
         assert teacher.username == "john_doe"
 
+    def test_get_students(self, db: Database):
+        results = db.get_students()
+        assert len(results) == 1
+        student, subject = results[0]
+        assert isinstance(student, Student)
+        assert student.name == "John"
+        assert isinstance(subject, Subject)
+        assert subject.name == "Math"
+
     def test_get_student(self, student: dict, db: Database):
-        student = db.get_student(student.get("telegram_id"))
+        student, subject = db.get_student(
+            student.get("telegram_id"), student.get("group")
+        )
         assert student.name == "John"
         assert student.telegram_id == 123456789
         assert student.group == "A"
+
+    def test_get_subjects(self, db: Database):
+        subjects = db.get_subjects()
+        assert len(subjects) == 1
+        assert isinstance(subjects[0], Subject)
+        assert subjects[0].name == "Math"
 
     def test_get_subject(self, subject: dict, db: Database):
         db_subject = db.get_subject(subject.get("name"))
@@ -73,6 +101,9 @@ class TestSimpleQueries:
 
     def test_is_teacher(self, teacher: dict, db: Database):
         assert db.is_teacher(teacher.get("telegram_id")) is True
+
+    def test_is_student(self, student: dict, db: Database):
+        assert db.is_student(student.get("telegram_id"), student.get("group")) is True
 
     # @pytest.mark.xfail(raises=IntegrityError)
     # def test_author_no_email(self, db_session):

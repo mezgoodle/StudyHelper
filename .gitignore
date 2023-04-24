@@ -137,5 +137,5 @@ dmypy.json
 # Logs
 *.zip
 
-# Files
-/files
+# VSCode
+.vscode
