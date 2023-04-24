@@ -26,7 +26,12 @@ async def register_teacher(message: Message) -> Message:
 
 @dp.message_handler(Command(["is_teacher"]), is_teacher=True)
 async def is_teacher(message: Message) -> Message:
-    return await message.answer("Hi, teacher!")
+    return await message.answer("Yes, you are the teacher!")
+
+
+@dp.message_handler(Command(["is_teacher"]))
+async def is_not_teacher(message: Message) -> Message:
+    return await message.answer("No, you are not the teacher!")
 
 
 @dp.message_handler(Command(["add_subject"]), is_teacher=True)
