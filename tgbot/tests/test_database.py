@@ -40,7 +40,15 @@ def teacher_fixture():
     }
 
 
-class TestSimpleQueries:
+class TestDatabase:
+    def test_create_student_fail(self, db: Database, student: dict):
+        with pytest.raises(ValueError):
+            db.create_student(**student)
+
+    def test_create_subject_fail(self, db: Database, subject: dict):
+        with pytest.raises(Exception):
+            db.create_subject(**subject)
+
     def test_create_teacher(self, session: Session, teacher: dict, db: Database):
         db.create_teacher(**teacher)
         db_teacher = session.query(Teacher).filter_by(name="John").first()
@@ -88,6 +96,7 @@ class TestSimpleQueries:
         assert student.name == "John"
         assert student.telegram_id == 123456789
         assert student.group == "A"
+        assert subject.name == "Math"
 
     def test_get_subjects(self, db: Database):
         subjects = db.get_subjects()
@@ -102,39 +111,11 @@ class TestSimpleQueries:
     def test_is_teacher(self, teacher: dict, db: Database):
         assert db.is_teacher(teacher.get("telegram_id")) is True
 
+    def test_is_not_teacher(self, db: Database):
+        assert db.is_teacher(111) is False
+
     def test_is_student(self, student: dict, db: Database):
         assert db.is_student(student.get("telegram_id"), student.get("group")) is True
 
-    # @pytest.mark.xfail(raises=IntegrityError)
-    # def test_author_no_email(self, db_session):
-    #     author = Author(firstname="James", lastname="Clear")
-    #     db_session.add(author)
-    #     try:
-    #         db_session.commit()
-    #     except IntegrityError:
-    #         db_session.rollback()
-
-    # def test_article_valid(self, db_session, valid_author):
-    #     valid_article = Article(
-    #         slug="sample-slug",
-    #         title="Title of the Valid Article",
-    #         content="Lorem ipsum dolor sit amet, consectetur adipiscing elit,
-    # sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-    # Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
-    # nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
-    # reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-    #  Excepteur sint occaecat cupidatat non proident,
-    # sunt in culpa qui officia deserunt mollit anim id est laborum.",
-    #         author=valid_author,
-    #     )
-    #     db_session.add(valid_article)
-    #     db_session.commit()
-    #     sample_article = db_session.query(Article).filter_by(
-    # slug="sample-slug"
-    # ).first()
-    #     assert sample_article.title == "Title of the Valid Article"
-    #     assert len(sample_article.content.split(" ")) > 50
-
-
-class TestComplexQueries:
-    pass
+    def test_is_not_student(self, db: Database):
+        assert db.is_student(111, "A") is False
