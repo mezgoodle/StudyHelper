@@ -119,7 +119,7 @@ class Database:
                 student = Student(
                     name=name,
                     telegram_id=telegram_id,
-                    group=[group],
+                    group_id=group.id,
                     username=username,
                     subjects=[subject],
                 )
@@ -158,10 +158,10 @@ class Database:
 
     def get_student(
         self, telegram_id: int, group_name: str
-    ) -> Optional[Tuple[Student, Subject]]:
+    ) -> Optional[Tuple[Student, Subject, Group]]:
         if group := self.get_group(group_name):
             return self.__get(
-                [Student, Subject],
+                [Student, Subject, Group],
                 conditions=(
                     Student.telegram_id == telegram_id,
                     Student.group_id == group.id,

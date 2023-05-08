@@ -53,6 +53,10 @@ class TestDatabase:
         with pytest.raises(Exception):
             db.create_group()
 
+    def test_create_teacher_fail(self, db: Database):
+        with pytest.raises(Exception):
+            db.create_teacher()
+
     def test_create_teacher(
         self, session: Session, teacher: dict, db: Database
     ):
@@ -76,7 +80,7 @@ class TestDatabase:
         db_student = session.query(Student).filter_by(name="John").first()
         assert db_student.name == student.get("name")
         assert db_student.telegram_id == student.get("telegram_id")
-        assert db_student.group == student.get("group_name")
+        assert db_student.group.name == student.get("group_name")
 
     def test_create_group(self, session: Session, db: Database, student: dict):
         db.create_group(student.get("group_name"))
@@ -105,12 +109,12 @@ class TestDatabase:
         assert subject.name == "Math"
 
     def test_get_student(self, student: dict, db: Database):
-        student, subject = db.get_student(
+        student, subject, group = db.get_student(
             student.get("telegram_id"), student.get("group_name")
         )
         assert student.name == "John"
         assert student.telegram_id == 123456789
-        assert student.group == "A"
+        assert group.name == "A"
         assert subject.name == "Math"
 
     def test_get_subjects(self, db: Database):
@@ -125,7 +129,7 @@ class TestDatabase:
 
     def test_get_groups(self, db: Database):
         groups = db.get_groups()
-        assert len(groups) == 1
+        assert len(groups) == 2
         assert isinstance(groups[0], Group)
         assert groups[0].name == "A"
 
