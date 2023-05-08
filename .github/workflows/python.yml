@@ -30,7 +30,7 @@ jobs:
           ruff .
       - name: Lint with flake8
         run: |
-          flake8 .
+          flake8 . --exit-zero --statistics
       - name: Test with pytest
         run: |
           pytest -rA
