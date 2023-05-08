@@ -9,7 +9,9 @@ from tgbot.models.database import Database
 from tgbot.models.validation_models import ValidationModel
 
 
-async def parse_students_from_file(path: Path, db: Database, message: Message) -> int:
+async def parse_students_from_file(
+    path: Path, db: Database, message: Message
+) -> int:
     extension = path.suffix
     df = FILE_EXTENSIONS.get(extension, read_csv)(path)
     df_dict = df.to_dict(orient="records")
@@ -20,11 +22,13 @@ async def parse_students_from_file(path: Path, db: Database, message: Message) -
             _ = db.create_student(
                 name=student["name"],
                 username=student["username"],
-                group=student["group"],
+                group_name=student["group"],
                 telegram_id=student["telegram_id"],
                 subject_name=student["subjects"],
             )
         except Exception as e:
-            await message.answer(f"Row {index} was not added. Error: {hbold(e)}")
+            await message.answer(
+                f"Row {index} was not added. Error: {hbold(e)}"
+            )
             number_of_students -= 1
     return number_of_students

@@ -1,7 +1,7 @@
 import pytest
 from sqlmodel import Session
 
-from tgbot.models.database import Database, Student, Subject, Teacher
+from tgbot.models.database import Database, Group, Student, Subject, Teacher
 
 
 @pytest.fixture(name="db")
@@ -20,7 +20,7 @@ def student_fixture():
     return {
         "name": "John",
         "telegram_id": 123456789,
-        "group": "A",
+        "group_name": "A",
         "username": "john_doe",
         "subject_name": "Math",
     }
@@ -49,24 +49,39 @@ class TestDatabase:
         with pytest.raises(Exception):
             db.create_subject(**subject)
 
-    def test_create_teacher(self, session: Session, teacher: dict, db: Database):
+    def test_create_group_fail(self, db: Database):
+        with pytest.raises(Exception):
+            db.create_group()
+
+    def test_create_teacher(
+        self, session: Session, teacher: dict, db: Database
+    ):
         db.create_teacher(**teacher)
         db_teacher = session.query(Teacher).filter_by(name="John").first()
         assert db_teacher.name == teacher.get("name")
         assert db_teacher.telegram_id == teacher.get("telegram_id")
         assert db_teacher.username == teacher.get("username")
 
-    def test_create_subject(self, session: Session, subject: dict, db: Database):
-        db.create_subject(**subject)
+    def test_create_subject(
+        self, session: Session, subject: dict, student: dict, db: Database
+    ):
+        db.create_subject(**subject, group_name=student.get("group_name"))
         db_subject = session.query(Subject).filter_by(name="Math").first()
         assert db_subject.name == subject.get("name")
 
-    def test_create_student(self, session: Session, student: dict, db: Database):
+    def test_create_student(
+        self, session: Session, student: dict, db: Database
+    ):
         db.create_student(**student)
         db_student = session.query(Student).filter_by(name="John").first()
         assert db_student.name == student.get("name")
         assert db_student.telegram_id == student.get("telegram_id")
-        assert db_student.group == student.get("group")
+        assert db_student.group == student.get("group_name")
+
+    def test_create_group(self, session: Session, db: Database, student: dict):
+        db.create_group(student.get("group_name"))
+        db_group = session.query(Group).filter_by(name="A").first()
+        assert db_group.name == student.get("group_name")
 
     def test_get_teachers(self, db: Database):
         teachers = db.get_teachers()
@@ -91,7 +106,7 @@ class TestDatabase:
 
     def test_get_student(self, student: dict, db: Database):
         student, subject = db.get_student(
-            student.get("telegram_id"), student.get("group")
+            student.get("telegram_id"), student.get("group_name")
         )
         assert student.name == "John"
         assert student.telegram_id == 123456789
@@ -108,6 +123,16 @@ class TestDatabase:
         db_subject = db.get_subject(subject.get("name"))
         assert db_subject.name == "Math"
 
+    def test_get_groups(self, db: Database):
+        groups = db.get_groups()
+        assert len(groups) == 1
+        assert isinstance(groups[0], Group)
+        assert groups[0].name == "A"
+
+    def test_get_group(self, db: Database, student: dict):
+        group = db.get_group(student.get("group_name"))
+        assert group.name == "A"
+
     def test_is_teacher(self, teacher: dict, db: Database):
         assert db.is_teacher(teacher.get("telegram_id")) is True
 
@@ -115,7 +140,12 @@ class TestDatabase:
         assert db.is_teacher(111) is False
 
     def test_is_student(self, student: dict, db: Database):
-        assert db.is_student(student.get("telegram_id"), student.get("group")) is True
+        assert (
+            db.is_student(
+                student.get("telegram_id"), student.get("group_name")
+            )
+            is True
+        )
 
     def test_is_not_student(self, db: Database):
         assert db.is_student(111, "A") is False
