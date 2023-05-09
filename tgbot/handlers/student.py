@@ -39,8 +39,10 @@ async def process_subject(message: Message, state: FSMContext) -> Message:
         name=user.full_name,
         telegram_id=user.id,
         username=user.username,
-        group=data["group"],
+        group_name=data["group"],
         subject_name=message.text,
     ):
-        return await message.answer("You are registered as student for this subject")
+        return await message.answer(
+            "You are registered as student for this subject"
+        )
     return await message.answer("Something went wrong")
