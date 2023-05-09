@@ -127,6 +127,12 @@ class TestDatabase:
         db_subject = db.get_subject(subject.get("name"))
         assert db_subject.name == "Math"
 
+    def test_get_subjects_by_group(self, db: Database, student: dict):
+        subjects = db.get_subjects_by_group(student.get("group_name"))
+        assert len(subjects) == 1
+        assert isinstance(subjects[0], Subject)
+        assert subjects[0].name == "Math"
+
     def test_get_groups(self, db: Database):
         groups = db.get_groups()
         assert len(groups) == 2
