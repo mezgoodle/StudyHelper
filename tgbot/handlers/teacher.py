@@ -9,6 +9,7 @@ from loader import dp
 from tgbot.misc.import_students import parse_students_from_file
 from tgbot.misc.utils import check_extension, delete_file, download_file
 from tgbot.models.database import Database
+from tgbot.states.states import File, Subject
 
 
 @dp.message_handler(Command(["register_teacher"]))
@@ -35,12 +36,12 @@ async def is_not_teacher(message: Message) -> Message:
 
 
 @dp.message_handler(Command(["add_subject"]), is_teacher=True)
-async def add_subject(message: Message, state: FSMContext) -> Message:
-    await state.set_state("subject_name")
+async def add_subject(message: Message) -> Message:
+    await Subject.first()
     return await message.answer("Send subject name")
 
 
-@dp.message_handler(state="subject_name")
+@dp.message_handler(state=Subject.name)
 async def answer_subject_name(message: Message, state: FSMContext) -> Message:
     await state.finish()
     db: Database = message.bot.get("db")
@@ -51,7 +52,7 @@ async def answer_subject_name(message: Message, state: FSMContext) -> Message:
 
 @dp.message_handler(Command(["add_students"]))
 async def add_students(message: Message, state: FSMContext) -> Message:
-    await state.set_state("wait_for_file")
+    await File.first()
     path_to_file = Path().joinpath("files", "exports", "example.xlsx")
     await message.answer_document(InputFile(path_to_file), caption="Example")
     return await message.answer(
@@ -59,7 +60,7 @@ async def add_students(message: Message, state: FSMContext) -> Message:
     )
 
 
-@dp.message_handler(state="wait_for_file", content_types=ContentTypes.DOCUMENT)
+@dp.message_handler(state=File.file, content_types=ContentTypes.DOCUMENT)
 async def process_file(message: Message, state: FSMContext) -> Message:
     await state.finish()
     if message.document:
@@ -74,7 +75,9 @@ async def process_file(message: Message, state: FSMContext) -> Message:
             delete_file(downloaded_path)
         except Exception as error_message:
             return await message.answer(error_message)
-        return await message.answer(f"{number_of_students} students were added.")
+        return await message.answer(
+            f"{number_of_students} students were added."
+        )
     return await message.answer(
         "You should send file with students' data. Formats: .csv, .xlsx, .xls"
     )
