@@ -240,6 +240,8 @@ class Database:
         conditions: tuple = None,
     ) -> Optional[LIST_OF_OBJECTS_TYPE]:
         logger.info("Try to get an object")
+        logger.info(f"{objects=}")
+        logger.info(f"{conditions=}")
         with Session(self.engine) as session:
             try:
                 if conditions is None:
@@ -253,3 +255,6 @@ class Database:
                 return results
             except CompileError as e:
                 logger.error(f"Error: {e}")
+
+    def drop_database(self):
+        SQLModel.metadata.drop_all(self.engine)
