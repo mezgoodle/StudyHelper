@@ -43,11 +43,25 @@ async def add_subject(message: Message) -> Message:
 
 @dp.message_handler(state=Subject.name)
 async def answer_subject_name(message: Message, state: FSMContext) -> Message:
-    await state.finish()
+    await state.update_data(subject_name=message.text)
+    await state.set_state("group_name")
+    return await message.answer("Send group name")
+
+
+@dp.message_handler(state="group_name")
+async def answer_group_name(message: Message, state: FSMContext) -> Message:
+    data = await state.get_data()
     db: Database = message.bot.get("db")
-    if db.create_subject(message.text, message.from_user.id):
-        return await message.answer(f"Subject {hbold(message.text)} was added")
-    return await message.answer(f"Subject {message.text} already exists")
+    if db.create_subject(
+        data["subject_name"], message.from_user.id, message.text
+    ):
+        await state.finish()
+        return await message.answer(
+            f"Subject {hbold(data['subject_name'])} was added"
+        )
+    return await message.answer(
+        f"Subject {data['subject_name']} already exists"
+    )
 
 
 @dp.message_handler(Command(["add_students"]))

@@ -1,5 +1,5 @@
 import pytest
-from sqlmodel import Session
+from sqlmodel import Session, inspect
 
 from tgbot.models.database import Database, Group, Student, Subject, Teacher
 
@@ -127,6 +127,12 @@ class TestDatabase:
         db_subject = db.get_subject(subject.get("name"))
         assert db_subject.name == "Math"
 
+    def test_get_subjects_by_group(self, db: Database, student: dict):
+        subjects = db.get_subjects_by_group(student.get("group_name"))
+        assert len(subjects) == 1
+        assert isinstance(subjects[0], Subject)
+        assert subjects[0].name == "Math"
+
     def test_get_groups(self, db: Database):
         groups = db.get_groups()
         assert len(groups) == 2
@@ -153,3 +159,11 @@ class TestDatabase:
 
     def test_is_not_student(self, db: Database):
         assert db.is_student(111, "A") is False
+
+    def test_drop_all(self, db: Database):
+        db.drop_database()
+        insp = inspect(db.engine)
+        assert insp.has_table("student") is False
+        assert insp.has_table("subject") is False
+        assert insp.has_table("group") is False
+        assert insp.has_table("teacher") is False
