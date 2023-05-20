@@ -44,11 +44,11 @@ async def add_subject(message: Message) -> Message:
 @dp.message_handler(state=Subject.name)
 async def answer_subject_name(message: Message, state: FSMContext) -> Message:
     await state.update_data(subject_name=message.text)
-    await state.set_state("group_name")
+    await Subject.next()
     return await message.answer("Send group name")
 
 
-@dp.message_handler(state="group_name")
+@dp.message_handler(state=Subject.group)
 async def answer_group_name(message: Message, state: FSMContext) -> Message:
     data = await state.get_data()
     db: Database = message.bot.get("db")
@@ -59,13 +59,14 @@ async def answer_group_name(message: Message, state: FSMContext) -> Message:
         return await message.answer(
             f"Subject {hbold(data['subject_name'])} was added"
         )
+    await state.finish()
     return await message.answer(
         f"Subject {data['subject_name']} already exists"
     )
 
 
 @dp.message_handler(Command(["add_students"]))
-async def add_students(message: Message, state: FSMContext) -> Message:
+async def add_students(message: Message) -> Message:
     await File.first()
     path_to_file = Path().joinpath("files", "exports", "example.xlsx")
     await message.answer_document(InputFile(path_to_file), caption="Example")
