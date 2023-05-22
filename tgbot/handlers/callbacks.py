@@ -11,5 +11,5 @@ async def deny_offer(call: CallbackQuery, callback_data: dict) -> Message:
     subjects_and_groups = db.get_subject(callback_data["name"])
     subject = subjects_and_groups[0][0]
     return await call.message.answer(
-        f"Name: {subject.name}.\nGroups: {', '.join([group.name for _, group in subjects_and_groups])}"
+        f"Name: {subject.name}.\nGroups: {', '.join([group.name for _, group in subjects_and_groups])}"  # noqa: E501
     )
