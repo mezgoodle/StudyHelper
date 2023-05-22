@@ -6,6 +6,7 @@ from aiogram.types import ContentTypes, InputFile, Message
 from aiogram.utils.markdown import hbold
 
 from loader import dp
+from tgbot.keyboards.inline.subjects import markup
 from tgbot.misc.import_students import parse_students_from_file
 from tgbot.misc.utils import check_extension, delete_file, download_file
 from tgbot.models.database import Database
@@ -33,6 +34,18 @@ async def is_teacher(message: Message) -> Message:
 @dp.message_handler(Command(["is_teacher"]))
 async def is_not_teacher(message: Message) -> Message:
     return await message.answer("No, you are not the teacher!")
+
+
+@dp.message_handler(Command(["my_subjects"]), is_teacher=True)
+async def teacher_subjects(message: Message) -> Message:
+    db: Database = message.bot.get("db")
+    if subjects := db.get_subjects_by_teacher(message.from_user.id):
+        subjects_markup = markup(subjects)
+        return await message.answer(
+            "Your subjects:",
+            reply_markup=subjects_markup,
+        )
+    return await message.answer("You don't have subjects")
 
 
 @dp.message_handler(Command(["add_subject"]), is_teacher=True)
