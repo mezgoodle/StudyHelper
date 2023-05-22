@@ -121,7 +121,7 @@ class Database:
                     telegram_id=telegram_id,
                     group_id=group.id,
                     username=username,
-                    subjects=[subject],
+                    subjects=[subject[0][0]],
                 )
                 return self.__create(student)
             raise ValueError("Group is not created")
@@ -183,7 +183,9 @@ class Database:
 
     def get_subject(self, name: str) -> Optional[Subject]:
         try:
-            return self.__get([Subject], conditions=(Subject.name == name,))[0]
+            return self.__get(
+                [Subject, Group], conditions=(Subject.name == name,)
+            )
         except IndexError:
             return None
 
