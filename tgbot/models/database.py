@@ -202,6 +202,18 @@ class Database:
             ]
         raise ValueError("Group is not founded")
 
+    def get_subjects_by_teacher(
+        self, teacher_telegram_id: int
+    ) -> Optional[list[Subject]]:
+        if teacher := self.get_teacher(teacher_telegram_id):
+            return [
+                data[1]
+                for data in self.__get(
+                    [Teacher, Subject], conditions=(Teacher.id == teacher.id,)
+                )
+            ]
+        raise ValueError("Teacher is not founded")
+
     def is_teacher(self, telegram_id: int) -> bool:
         return self.get_teacher(telegram_id) is not None
 
