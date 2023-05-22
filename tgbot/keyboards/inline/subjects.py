@@ -10,15 +10,15 @@ def markup(subject: list[Subject]) -> InlineKeyboardMarkup:
         markup.row(
             InlineKeyboardButton(
                 text=subject.name,
-                callback_data=subject_callback.new("show", subject.id),
+                callback_data=subject_callback.new("show", subject.name),
             ),
             InlineKeyboardButton(
                 text="Delete from me",
-                callback_data=subject_callback.new("delete", subject.id),
+                callback_data=subject_callback.new("delete", subject.name),
             ),
             InlineKeyboardButton(
                 text="Edit this subject",
-                callback_data=subject_callback.new("edit", subject.id),
+                callback_data=subject_callback.new("edit", subject.name),
             ),
         )
     return markup
