@@ -121,7 +121,7 @@ class Database:
                     telegram_id=telegram_id,
                     group_id=group.id,
                     username=username,
-                    subjects=[subject],
+                    subjects=[subject[0][0]],
                 )
                 return self.__create(student)
             raise ValueError("Group is not created")
@@ -183,7 +183,9 @@ class Database:
 
     def get_subject(self, name: str) -> Optional[Subject]:
         try:
-            return self.__get([Subject], conditions=(Subject.name == name,))[0]
+            return self.__get(
+                [Subject, Group], conditions=(Subject.name == name,)
+            )
         except IndexError:
             return None
 
@@ -201,6 +203,18 @@ class Database:
                 )
             ]
         raise ValueError("Group is not founded")
+
+    def get_subjects_by_teacher(
+        self, teacher_telegram_id: int
+    ) -> Optional[list[Subject]]:
+        if teacher := self.get_teacher(teacher_telegram_id):
+            return [
+                data[1]
+                for data in self.__get(
+                    [Teacher, Subject], conditions=(Teacher.id == teacher.id,)
+                )
+            ]
+        raise ValueError("Teacher is not founded")
 
     def is_teacher(self, telegram_id: int) -> bool:
         return self.get_teacher(telegram_id) is not None

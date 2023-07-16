@@ -7,6 +7,7 @@ from loguru import logger
 from loader import dp
 from tgbot.config import config
 from tgbot.filters.registered import IsStudentFilter, IsTeacherFilter
+from tgbot.middlewares.callbacks import CallbackMiddleware
 from tgbot.middlewares.throttling import ThrottlingMiddleware
 from tgbot.models.database import Database
 from tgbot.services.admins_notify import on_startup_notify
@@ -16,6 +17,7 @@ from tgbot.services.setting_commands import set_default_commands
 def register_all_middlewares(dispatcher: Dispatcher) -> None:
     logger.info("Registering middlewares")
     dispatcher.setup_middleware(ThrottlingMiddleware())
+    dispatcher.setup_middleware(CallbackMiddleware())
 
 
 def register_all_filters(dispatcher: Dispatcher) -> None:
