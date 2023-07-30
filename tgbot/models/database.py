@@ -207,7 +207,7 @@ class SubjectDB(Database):
         try:
             return self.get(
                 [Subject, Group], conditions=(Subject.name == name,)
-            )
+            )[0]
         except IndexError:
             return None
 
@@ -275,18 +275,18 @@ class StudentDB(Database):
         username: str,
         subject_name: str,
     ) -> Optional[Student]:
-        if student_info := self.get_student(telegram_id, group_name):
-            student: Student = student_info[0]
-            student.subjects.append(subject_name)
-            return self.update(student)
-        if subject := self.subject_db.get_subject(subject_name):
+        if subject_info := self.subject_db.get_subject(subject_name):
+            if student_info := self.get_student(telegram_id, group_name):
+                student: Student = student_info[0]
+                student.subjects.append(subject_info[0])
+                return self.update(student)
             if group := self.group_db.get_group(group_name):
                 student = Student(
                     name=name,
                     telegram_id=telegram_id,
                     group_id=group.id,
                     username=username,
-                    subjects=[subject[0][0]],
+                    subjects=[subject_info[0]],
                 )
                 return self.create(student)
             raise ValueError("Group is not created")

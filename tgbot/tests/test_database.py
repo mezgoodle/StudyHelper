@@ -175,7 +175,7 @@ class TestSubjectDB:
         assert subjects[0].name == "Math"
 
     def test_get_subject(self, subject: dict, subjectdb: SubjectDB):
-        db_subject, db_group = subjectdb.get_subject(subject.get("name"))[0]
+        db_subject, db_group = subjectdb.get_subject(subject.get("name"))
         assert db_subject.name == "Math"
         assert db_group.name == "A"
 
@@ -226,9 +226,15 @@ class TestStudentDB:
                 group_name="non_existing_group",
             )
 
-    def test_create_student_with_non_existing_subject(
-        self, student: dict, studentdb: StudentDB
-    ):
+        with pytest.raises(ValueError):
+            studentdb.create_student(
+                name=student.get("name"),
+                telegram_id=student.get("telegram_id"),
+                username=student.get("username"),
+                subject_name=student.get("subject_name"),
+                group_name="non_existing_group",
+            )
+
         with pytest.raises(ValueError):
             studentdb.create_student(
                 name=student.get("name"),
@@ -237,6 +243,10 @@ class TestStudentDB:
                 subject_name="non_existing_subject",
                 group_name=student.get("group_name"),
             )
+
+    # def test_create_student_with_non_existing_subject(
+    #     self, student: dict, studentdb: StudentDB
+    # ):
 
     def test_get_students(self, studentdb: StudentDB):
         results = studentdb.get_students()
