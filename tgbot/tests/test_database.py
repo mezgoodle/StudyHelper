@@ -215,27 +215,28 @@ class TestStudentDB:
         assert db_student.group.name == student.get("group_name")
 
     def test_create_student_with_non_existing_group(
+        self, student: dict, studentdb: StudentDB, session: Session
+    ):
+        # create temporary subject
+        subject = Subject(name="Math")
+        session.add(subject)
+        session.commit()
+        with pytest.raises(ValueError, match="Group is not created"):
+            studentdb.create_student(
+                name=student.get("name"),
+                telegram_id=student.get("telegram_id"),
+                username=student.get("username"),
+                subject_name=student.get("subject_name"),
+                group_name="non_existing_group",
+            )
+        # delete temporary subject
+        session.delete(subject)
+        session.commit()
+
+    def test_create_student_with_non_existing_subject(
         self, student: dict, studentdb: StudentDB
     ):
-        with pytest.raises(ValueError):
-            studentdb.create_student(
-                name=student.get("name"),
-                telegram_id=student.get("telegram_id"),
-                username=student.get("username"),
-                subject_name=student.get("subject_name"),
-                group_name="non_existing_group",
-            )
-
-        with pytest.raises(ValueError):
-            studentdb.create_student(
-                name=student.get("name"),
-                telegram_id=student.get("telegram_id"),
-                username=student.get("username"),
-                subject_name=student.get("subject_name"),
-                group_name="non_existing_group",
-            )
-
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="Subject is not created"):
             studentdb.create_student(
                 name=student.get("name"),
                 telegram_id=student.get("telegram_id"),
@@ -243,10 +244,6 @@ class TestStudentDB:
                 subject_name="non_existing_subject",
                 group_name=student.get("group_name"),
             )
-
-    # def test_create_student_with_non_existing_subject(
-    #     self, student: dict, studentdb: StudentDB
-    # ):
 
     def test_get_students(self, studentdb: StudentDB):
         results = studentdb.get_students()

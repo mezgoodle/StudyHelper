@@ -276,18 +276,19 @@ class StudentDB(Database):
         subject_name: str,
     ) -> Optional[Student]:
         if subject_info := self.subject_db.get_subject(subject_name):
-            if student_info := self.get_student(telegram_id, group_name):
-                student: Student = student_info[0]
-                student.subjects.append(subject_info[0])
-                return self.update(student)
             if group := self.group_db.get_group(group_name):
-                student = Student(
-                    name=name,
-                    telegram_id=telegram_id,
-                    group_id=group.id,
-                    username=username,
-                    subjects=[subject_info[0]],
-                )
-                return self.create(student)
+                if student_info := self.get_student(telegram_id, group_name):
+                    student: Student = student_info[0]
+                    student.subjects.append(subject_info[0])
+                    return self.update(student)
+                else:
+                    student = Student(
+                        name=name,
+                        telegram_id=telegram_id,
+                        group_id=group.id,
+                        username=username,
+                        subjects=[subject_info[0]],
+                    )
+                    return self.create(student)
             raise ValueError("Group is not created")
         raise ValueError("Subject is not created")
