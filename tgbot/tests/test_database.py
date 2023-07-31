@@ -256,7 +256,6 @@ class TestStudentDB:
         studentdb.add_subject_to_student(
             telegram_id=student.get("telegram_id"),
             subject_name=subject.name,
-            group_name=student.get("group_name"),
         )
         db_student = session.query(Student).filter_by(name="John").first()
         assert db_student.name == student.get("name")
