@@ -163,7 +163,9 @@ class TestSubjectDB:
         session.commit()
 
         subjectdb.create_subject(
-            **subject, group_name=student.get("group_name")
+            name="Physics",
+            teacher_telegram_id=subject.get("teacher_telegram_id"),
+            group_name=student.get("group_name"),
         )
         db_subject = session.query(Subject).filter_by(name="Math").first()
         assert db_subject.name == subject.get("name")
@@ -245,9 +247,26 @@ class TestStudentDB:
                 group_name=student.get("group_name"),
             )
 
+    def test_add_subject_to_the_student(
+        self, student: dict, studentdb: StudentDB, session: Session
+    ):
+        subject = Subject(name="Chemistry")
+        session.add(subject)
+        session.commit()
+        studentdb.add_subject_to_student(
+            telegram_id=student.get("telegram_id"),
+            subject_name=subject.name,
+            group_name=student.get("group_name"),
+        )
+        db_student = session.query(Student).filter_by(name="John").first()
+        assert db_student.name == student.get("name")
+        assert db_student.telegram_id == student.get("telegram_id")
+        assert db_student.group.name == student.get("group_name")
+        assert len(db_student.subjects) == 2
+
     def test_get_students(self, studentdb: StudentDB):
         results = studentdb.get_students()
-        assert len(results) == 2
+        assert len(results) == 3
         student, subject = results[0]
         assert isinstance(student, Student)
         assert student.name == "John"

@@ -109,18 +109,6 @@ class Database:
             except CompileError as e:
                 logger.error(f"Error: {e}")
 
-    def update(
-        self, obj: Union[Teacher, Student, Subject]
-    ) -> Optional[Union[Teacher, Student, Subject]]:
-        with Session(self.engine) as session:
-            try:
-                session.add(obj)
-                session.commit()
-                session.refresh(obj)
-                return obj
-            except CompileError as e:
-                logger.error(f"Error: {e}")
-
     def get(
         self,
         objects: LIST_OF_OBJECTS_TYPE,
@@ -277,18 +265,30 @@ class StudentDB(Database):
     ) -> Optional[Student]:
         if subject_info := self.subject_db.get_subject(subject_name):
             if group := self.group_db.get_group(group_name):
-                if student_info := self.get_student(telegram_id, group_name):
-                    student: Student = student_info[0]
-                    student.subjects.append(subject_info[0])
-                    return self.update(student)
-                else:
-                    student = Student(
-                        name=name,
-                        telegram_id=telegram_id,
-                        group_id=group.id,
-                        username=username,
-                        subjects=[subject_info[0]],
-                    )
-                    return self.create(student)
+                student = Student(
+                    name=name,
+                    telegram_id=telegram_id,
+                    group_id=group.id,
+                    username=username,
+                    subjects=[subject_info[0]],
+                )
+                return self.create(student)
             raise ValueError("Group is not created")
         raise ValueError("Subject is not created")
+
+    def add_subject_to_student(
+        self,
+        telegram_id: int,
+        subject_name: str,
+    ) -> Optional[Student]:
+        with Session(self.engine) as session:
+            student = session.exec(
+                select(Student).where(Student.telegram_id == telegram_id)
+            ).first()
+            subject = session.exec(
+                select(Subject).where(Subject.name == subject_name)
+            ).first()
+            student.subjects.append(subject)
+            session.add(student)
+            session.commit()
+        return student
