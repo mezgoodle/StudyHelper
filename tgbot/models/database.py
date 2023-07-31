@@ -95,134 +95,7 @@ class Database:
         self.engine = create_engine(sqlite_url, echo=True)
         SQLModel.metadata.create_all(self.engine)
 
-    def create_teacher(
-        self, name: str, telegram_id: int, username: str
-    ) -> Optional[Teacher]:
-        teacher = Teacher(
-            name=name, telegram_id=telegram_id, username=username
-        )
-        return self.__create(teacher)
-
-    def create_student(
-        self,
-        name: str,
-        telegram_id: int,
-        group_name: str,
-        username: str,
-        subject_name: str,
-    ) -> Optional[Student]:
-        if student := self.get_student(telegram_id, group_name):
-            student.subjects.append(subject_name)
-            return self.__update(student)
-        if subject := self.get_subject(subject_name):
-            if group := self.get_group(group_name):
-                student = Student(
-                    name=name,
-                    telegram_id=telegram_id,
-                    group_id=group.id,
-                    username=username,
-                    subjects=[subject[0][0]],
-                )
-                return self.__create(student)
-            raise ValueError("Group is not created")
-        raise ValueError("Subject is not created")
-
-    def create_subject(
-        self, name: str, teacher_telegram_id: int, group_name: str
-    ) -> Optional[Subject]:
-        teacher = self.get_teacher(teacher_telegram_id)
-        if group := self.get_group(group_name):
-            subject = Subject(name=name, teacher=[teacher], groups=[group])
-            return self.__create(subject)
-        group = self.create_group(group_name)
-        subject = Subject(name=name, teacher=[teacher], groups=[group])
-        return self.__create(subject)
-
-    def create_group(self, name: str) -> Optional[Group]:
-        group = Group(name=name)
-        return self.__create(group)
-
-    def get_teacher(self, telegram_id: int) -> Optional[Teacher]:
-        try:
-            return self.__get(
-                [Teacher], conditions=(Teacher.telegram_id == telegram_id,)
-            )[0]
-        except IndexError:
-            return None
-
-    def get_teachers(self) -> Optional[list[Teacher]]:
-        return self.__get([Teacher])
-
-    def get_group(self, name: str) -> Optional[Group]:
-        try:
-            return self.__get([Group], conditions=(Group.name == name,))[0]
-        except IndexError:
-            return None
-
-    def get_groups(self) -> Optional[list[Group]]:
-        return self.__get([Group])
-
-    def get_student(
-        self, telegram_id: int, group_name: str
-    ) -> Optional[Tuple[Student, Subject, Group]]:
-        if group := self.get_group(group_name):
-            try:
-                return self.__get(
-                    [Student, Subject, Group],
-                    conditions=(
-                        Student.telegram_id == telegram_id,
-                        Student.group_id == group.id,
-                    ),
-                )[0]
-            except IndexError:
-                return None
-        raise ValueError("Group is not founded")
-
-    def get_students(self) -> Optional[list[Tuple[Student, Subject]]]:
-        return self.__get([Student, Subject])
-
-    def get_subject(self, name: str) -> Optional[Subject]:
-        try:
-            return self.__get(
-                [Subject, Group], conditions=(Subject.name == name,)
-            )
-        except IndexError:
-            return None
-
-    def get_subjects(self) -> Optional[list[Subject]]:
-        return self.__get([Subject])
-
-    def get_subjects_by_group(
-        self, group_name: str
-    ) -> Optional[list[Subject]]:
-        if group := self.get_group(group_name):
-            return [
-                data[1]
-                for data in self.__get(
-                    [Group, Subject], conditions=(Group.id == group.id,)
-                )
-            ]
-        raise ValueError("Group is not founded")
-
-    def get_subjects_by_teacher(
-        self, teacher_telegram_id: int
-    ) -> Optional[list[Subject]]:
-        if teacher := self.get_teacher(teacher_telegram_id):
-            return [
-                data[1]
-                for data in self.__get(
-                    [Teacher, Subject], conditions=(Teacher.id == teacher.id,)
-                )
-            ]
-        raise ValueError("Teacher is not founded")
-
-    def is_teacher(self, telegram_id: int) -> bool:
-        return self.get_teacher(telegram_id) is not None
-
-    def is_student(self, telegram_id: int, group_name: str) -> bool:
-        return self.get_student(telegram_id, group_name) is not None
-
-    def __create(
+    def create(
         self, obj: Union[Teacher, Student, Subject, Group]
     ) -> Optional[Union[Teacher, Student, Subject, Group]]:
         logger.info("Try to create an object")
@@ -236,19 +109,7 @@ class Database:
             except CompileError as e:
                 logger.error(f"Error: {e}")
 
-    def __update(
-        self, obj: Union[Teacher, Student, Subject]
-    ) -> Optional[Union[Teacher, Student, Subject]]:
-        with Session(self.engine) as session:
-            try:
-                session.add(obj)
-                session.commit()
-                session.refresh(obj)
-                return obj
-            except CompileError as e:
-                logger.error(f"Error: {e}")
-
-    def __get(
+    def get(
         self,
         objects: LIST_OF_OBJECTS_TYPE,
         conditions: tuple = None,
@@ -272,3 +133,162 @@ class Database:
 
     def drop_database(self):
         SQLModel.metadata.drop_all(self.engine)
+
+
+class TeacherDB(Database):
+    def is_teacher(self, telegram_id: int) -> bool:
+        return self.get_teacher(telegram_id) is not None
+
+    def get_teacher(self, telegram_id: int) -> Optional[Teacher]:
+        try:
+            return self.get(
+                [Teacher], conditions=(Teacher.telegram_id == telegram_id,)
+            )[0]
+        except IndexError:
+            return None
+
+    def get_teachers(self) -> Optional[list[Teacher]]:
+        return self.get([Teacher])
+
+    def create_teacher(
+        self, name: str, telegram_id: int, username: str
+    ) -> Optional[Teacher]:
+        teacher = Teacher(
+            name=name, telegram_id=telegram_id, username=username
+        )
+        return self.create(teacher)
+
+
+class GroupDB(Database):
+    def create_group(self, name: str) -> Optional[Group]:
+        group = Group(name=name)
+        return self.create(group)
+
+    def get_group(self, name: str) -> Optional[Group]:
+        try:
+            return self.get([Group], conditions=(Group.name == name,))[0]
+        except IndexError:
+            return None
+
+    def get_groups(self) -> Optional[list[Group]]:
+        return self.get([Group])
+
+
+class SubjectDB(Database):
+    def __init__(self):
+        self.group_db = GroupDB()
+        self.teacher_db = TeacherDB()
+        super().__init__()
+
+    def create_subject(
+        self, name: str, teacher_telegram_id: int, group_name: str
+    ) -> Optional[Subject]:
+        teacher = self.teacher_db.get_teacher(teacher_telegram_id)
+        if group := self.group_db.get_group(group_name):
+            subject = Subject(name=name, teacher=[teacher], groups=[group])
+            return self.create(subject)
+        group = self.group_db.create_group(group_name)
+        subject = Subject(name=name, teacher=[teacher], groups=[group])
+        return self.create(subject)
+
+    def get_subject(self, name: str) -> Optional[Subject]:
+        try:
+            return self.get(
+                [Subject, Group], conditions=(Subject.name == name,)
+            )[0]
+        except IndexError:
+            return None
+
+    def get_subjects(self) -> Optional[list[Subject]]:
+        return self.get([Subject])
+
+    def get_subjects_by_group(
+        self, group_name: str
+    ) -> Optional[list[Subject]]:
+        if group := self.group_db.get_group(group_name):
+            return [
+                data[1]
+                for data in self.get(
+                    [Group, Subject], conditions=(Group.id == group.id,)
+                )
+            ]
+        raise ValueError("Group is not founded")
+
+    def get_subjects_by_teacher(
+        self, teacher_telegram_id: int
+    ) -> Optional[list[Subject]]:
+        if teacher := self.teacher_db.get_teacher(teacher_telegram_id):
+            return [
+                data[1]
+                for data in self.get(
+                    [Teacher, Subject], conditions=(Teacher.id == teacher.id,)
+                )
+            ]
+        raise ValueError("Teacher is not founded")
+
+
+class StudentDB(Database):
+    def __init__(self):
+        self.group_db = GroupDB()
+        self.subject_db = SubjectDB()
+        super().__init__()
+
+    def is_student(self, telegram_id: int, group_name: str) -> bool:
+        return self.get_student(telegram_id, group_name) is not None
+
+    def get_student(
+        self, telegram_id: int, group_name: str
+    ) -> Optional[Tuple[Student, Subject, Group]]:
+        if group := self.group_db.get_group(group_name):
+            try:
+                return self.get(
+                    [Student, Subject, Group],
+                    conditions=(
+                        Student.telegram_id == telegram_id,
+                        Student.group_id == group.id,
+                    ),
+                )[0]
+            except IndexError:
+                return None
+        raise ValueError("Group is not founded")
+
+    def get_students(self) -> Optional[list[Tuple[Student, Subject]]]:
+        return self.get([Student, Subject])
+
+    def create_student(
+        self,
+        name: str,
+        telegram_id: int,
+        group_name: str,
+        username: str,
+        subject_name: str,
+    ) -> Optional[Student]:
+        if subject_info := self.subject_db.get_subject(subject_name):
+            if group := self.group_db.get_group(group_name):
+                student = Student(
+                    name=name,
+                    telegram_id=telegram_id,
+                    group_id=group.id,
+                    username=username,
+                    subjects=[subject_info[0]],
+                )
+                return self.create(student)
+            raise ValueError("Group is not created")
+        raise ValueError("Subject is not created")
+
+    def add_subject_to_student(
+        self,
+        telegram_id: int,
+        subject_name: str,
+    ) -> Optional[Student]:
+        with Session(self.engine) as session:
+            student = session.exec(
+                select(Student).where(Student.telegram_id == telegram_id)
+            ).first()
+            subject = session.exec(
+                select(Subject).where(Subject.name == subject_name)
+            ).first()
+            student.subjects.append(subject)
+            session.add(student)
+            session.commit()
+        return student
