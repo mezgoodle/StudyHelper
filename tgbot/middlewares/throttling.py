@@ -64,7 +64,8 @@ class ThrottlingMiddleware(BaseMiddleware):
         self, message: types.Message, throttled: Throttled
     ):
         """
-        Notify user only on first exceed and notify about unlocking only on last exceed
+        Notify user only on first exceed and notify
+        about unlocking only on last exceed
         """
         handler = current_handler.get()
         dispatcher = Dispatcher.get_current()

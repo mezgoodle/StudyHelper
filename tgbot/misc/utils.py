@@ -8,7 +8,7 @@ def check_extension(
 ):
     if not file_name.lower().endswith(allowed_extensions):
         raise Exception(
-            """You should send file with students' data. 
+            """You should send file with students' data.
 Formats: <b>.csv</b>, <b>.xlsx</b>, <b>.xls</b>"""
         )
 
