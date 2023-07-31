@@ -1,1 +1,1 @@
-from . import callbacks, teacher, student, echo, errors
+from . import callbacks, echo, errors, student, teacher  # noqa

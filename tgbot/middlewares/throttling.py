@@ -60,7 +60,9 @@ class ThrottlingMiddleware(BaseMiddleware):
             # Cancel current handler
             raise CancelHandler()
 
-    async def message_throttled(self, message: types.Message, throttled: Throttled):
+    async def message_throttled(
+        self, message: types.Message, throttled: Throttled
+    ):
         """
         Notify user only on first exceed and notify about unlocking only on last exceed
         """

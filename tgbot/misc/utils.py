@@ -14,7 +14,9 @@ Formats: <b>.csv</b>, <b>.xlsx</b>, <b>.xls</b>"""
 
 
 async def download_file(
-    file_name: str, message: Message, folders: tuple[str] = ("files", "imports")
+    file_name: str,
+    message: Message,
+    folders: tuple[str] = ("files", "imports"),
 ) -> Path:
     try:
         path_to_download = Path().joinpath(*folders)
