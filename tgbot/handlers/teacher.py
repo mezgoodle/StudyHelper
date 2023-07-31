@@ -84,7 +84,7 @@ async def add_students(message: Message) -> Message:
     path_to_file = Path().joinpath("files", "exports", "example.xlsx")
     await message.answer_document(InputFile(path_to_file), caption="Example")
     return await message.answer(
-        "Send file with students' data as in the example. Formats: .csv, .xlsx, .xls"
+        "Send file with students' data as in the example. Formats: .csv, .xlsx, .xls"  # noqa: E501
     )
 
 

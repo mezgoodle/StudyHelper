@@ -85,7 +85,7 @@ class Teacher(SQLModel, table=True):
 
 
 LIST_OF_OBJECTS_TYPE = NewType(
-    "LIST_OF_OBJECTS", List[Union[Subject, Student, Teacher, Group]]
+    "LIST_OF_OBJECTS_TYPE", List[Union[Subject, Student, Teacher, Group]]
 )
 
 
@@ -108,6 +108,7 @@ class Database:
                 return obj
             except CompileError as e:
                 logger.error(f"Error: {e}")
+                return None
 
     def get(
         self,
@@ -130,6 +131,7 @@ class Database:
                 return results
             except CompileError as e:
                 logger.error(f"Error: {e}")
+                return None
 
     def drop_database(self):
         SQLModel.metadata.drop_all(self.engine)
