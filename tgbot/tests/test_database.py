@@ -150,27 +150,27 @@ class TestSubjectDB:
         db_subject = session.query(Subject).filter_by(name="Math").first()
         assert db_subject.name == subject.get("name")
 
-    # def test_create_subject_and_group(
-    #     self,
-    #     session: Session,
-    #     subject: dict,
-    #     student: dict,
-    #     subjectdb: SubjectDB,
-    # ):
-    #     group_in_db = session.query(Group).filter_by(name="A").first()
-    #     assert group_in_db is not None
-    #     session.delete(group_in_db)
-    #     session.commit()
+    def test_create_subject_and_group(
+        self,
+        session: Session,
+        subject: dict,
+        student: dict,
+        subjectdb: SubjectDB,
+    ):
+        group_in_db = session.query(Group).filter_by(name="A").first()
+        assert group_in_db is not None
+        session.delete(group_in_db)
+        session.commit()
 
-    #     subjectdb.create_subject(
-    #         **subject, group_name=student.get("group_name")
-    #     )
-    #     db_subject = session.query(Subject).filter_by(name="Math").first()
-    #     assert db_subject.name == subject.get("name")
+        subjectdb.create_subject(
+            **subject, group_name=student.get("group_name")
+        )
+        db_subject = session.query(Subject).filter_by(name="Math").first()
+        assert db_subject.name == subject.get("name")
 
     def test_get_subjects(self, subjectdb: SubjectDB):
         subjects = subjectdb.get_subjects()
-        assert len(subjects) == 1
+        assert len(subjects) == 2
         assert isinstance(subjects[0], Subject)
         assert subjects[0].name == "Math"
 
@@ -181,7 +181,7 @@ class TestSubjectDB:
 
     def test_get_subjects_by_group(self, subjectdb: SubjectDB, student: dict):
         subjects = subjectdb.get_subjects_by_group(student.get("group_name"))
-        assert len(subjects) == 1
+        assert len(subjects) == 2
         assert isinstance(subjects[0], Subject)
         assert subjects[0].name == "Math"
 
@@ -195,7 +195,7 @@ class TestSubjectDB:
         subjects = subjectdb.get_subjects_by_teacher(
             teacher.get("telegram_id")
         )
-        assert len(subjects) == 1
+        assert len(subjects) == 2
         assert isinstance(subjects[0], Subject)
         assert subjects[0].name == "Math"
 
@@ -247,7 +247,7 @@ class TestStudentDB:
 
     def test_get_students(self, studentdb: StudentDB):
         results = studentdb.get_students()
-        assert len(results) == 1
+        assert len(results) == 2
         student, subject = results[0]
         assert isinstance(student, Student)
         assert student.name == "John"
