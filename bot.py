@@ -1,107 +1,56 @@
-import os
+import asyncio
+import logging
+import sys
+from os import getenv
 
-from aiogram import Dispatcher
-from aiogram.utils.executor import start_polling, start_webhook  # noqa: F401
-from loguru import logger
+from aiogram import Bot, Dispatcher, Router, types
+from aiogram.enums import ParseMode
+from aiogram.filters import CommandStart
+from aiogram.types import Message
+from aiogram.utils.markdown import hbold
 
-from loader import dp
-from tgbot.config import config
-from tgbot.filters.registered import IsStudentFilter, IsTeacherFilter
-from tgbot.middlewares.callbacks import CallbackMiddleware
-from tgbot.middlewares.throttling import ThrottlingMiddleware
-from tgbot.models.database import Database
-from tgbot.services.admins_notify import on_startup_notify
-from tgbot.services.setting_commands import set_default_commands
+# Bot token can be obtained via https://t.me/BotFather
+TOKEN = "5767315485:AAHpshT9CI1ykYX8Ql4mhmOqGL4yoLGYsMo"
 
-
-def register_all_middlewares(dispatcher: Dispatcher) -> None:
-    logger.info("Registering middlewares")
-    dispatcher.setup_middleware(ThrottlingMiddleware())
-    dispatcher.setup_middleware(CallbackMiddleware())
+# All handlers should be attached to the Router (or Dispatcher)
+dp = Dispatcher()
 
 
-def register_all_filters(dispatcher: Dispatcher) -> None:
-    logger.info("Registering filters")
-    dispatcher.filters_factory.bind(IsTeacherFilter)
-    dispatcher.filters_factory.bind(IsStudentFilter)
+@dp.message(CommandStart())
+async def command_start_handler(message: Message) -> None:
+    """
+    This handler receives messages with `/start` command
+    """
+    # Most event objects have aliases for API methods that can be called in events' context
+    # For example if you want to answer to incoming message you can use `message.answer(...)` alias
+    # and the target chat will be passed to :ref:`aiogram.methods.send_message.SendMessage`
+    # method automatically or call API method directly via
+    # Bot instance: `bot.send_message(chat_id=message.chat.id, ...)`
+    await message.answer(f"Hello, {hbold(message.from_user.full_name)}!")
 
 
-def register_all_handlers(dispatcher: Dispatcher) -> None:
-    from tgbot import handlers  # noqa: F401
+@dp.message()
+async def echo_handler(message: types.Message) -> None:
+    """
+    Handler will forward receive a message back to the sender
 
-    logger.info("Registering handlers")
-
-
-async def register_all_commands(dispatcher: Dispatcher) -> None:
-    logger.info("Registering commands")
-    await set_default_commands(dispatcher.bot)
-
-
-def create_db(dispatcher: Dispatcher):
-    logger.info("Creating engine and tables in db")
-    db = Database()
-    dispatcher.bot["db"] = db
+    By default, message handler will handle all message types (like a text, photo, sticker etc.)
+    """
+    try:
+        # Send a copy of the received message
+        await message.send_copy(chat_id=message.chat.id)
+    except TypeError:
+        # But not all the types is supported to be copied so need to handle it
+        await message.answer("Nice try!")
 
 
-async def on_startup(dispatcher: Dispatcher, webhook_url: str = None) -> None:
-    register_all_middlewares(dispatcher)
-    register_all_filters(dispatcher)
-    register_all_handlers(dispatcher)
-    await register_all_commands(dispatcher)
-    create_db(dispatcher)
-    # Get current webhook status
-    webhook = await dispatcher.bot.get_webhook_info()
-
-    if webhook_url:
-        await dispatcher.bot.set_webhook(webhook_url)
-        logger.info("Webhook was set")
-    elif webhook.url:
-        await dispatcher.bot.delete_webhook()
-        logger.info("Webhook was deleted")
-
-    await on_startup_notify(dispatcher)
-
-    logger.info("Bot started")
-
-
-async def on_shutdown(dispatcher: Dispatcher) -> None:
-    await dispatcher.storage.close()
-    await dispatcher.storage.wait_closed()
-    logger.info("Bot shutdown")
+async def main() -> None:
+    # Initialize Bot instance with a default parse mode which will be passed to all API calls
+    bot = Bot(TOKEN, parse_mode=ParseMode.HTML)
+    # And the run events dispatching
+    await dp.start_polling(bot)
 
 
 if __name__ == "__main__":
-    logger.add(
-        "tgbot.log",
-        format="{time:YYYY-MM-DD at HH:mm:ss} | {level} | {message}",
-        rotation="10 KB",
-        compression="zip",
-    )
-
-    logger.info("Initializing bot")
-
-    # Webhook settings
-    HEROKU_APP_NAME = os.getenv("HEROKU_APP_NAME")
-    WEBHOOK_HOST = f"https://{HEROKU_APP_NAME}.herokuapp.com"
-    WEBHOOK_PATH = f"/webhook/{config.bot_token.get_secret_value()}"
-    WEBHOOK_URL = f"{WEBHOOK_HOST}{WEBHOOK_PATH}"
-    # Webserver settings
-    WEBAPP_HOST = "0.0.0.0"
-    WEBAPP_PORT = int(os.getenv("PORT", 5000))
-
-    start_polling(
-        dispatcher=dp,
-        on_startup=on_startup,
-        on_shutdown=on_shutdown,
-        skip_updates=True,
-    )
-
-    # start_webhook(
-    #     dispatcher=dp,
-    #     on_startup=functools.partial(on_startup, webhook_url=WEBHOOK_URL),
-    #     on_shutdown=on_shutdown,
-    #     webhook_path=WEBHOOK_PATH,
-    #     skip_updates=True,
-    #     host=WEBAPP_HOST,
-    #     port=WEBAPP_PORT
-    # )
+    logging.basicConfig(level=logging.INFO, stream=sys.stdout)
+    asyncio.run(main())
