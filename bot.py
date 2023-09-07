@@ -6,6 +6,7 @@ from aiogram import Dispatcher
 from loader import bot, dp
 from tgbot.config import Settings, config
 from tgbot.middlewares.settings import ConfigMiddleware
+from tgbot.middlewares.throttling import ThrottlingMiddleware
 
 
 def register_all_handlers() -> None:
@@ -17,6 +18,7 @@ def register_all_handlers() -> None:
 def register_global_middlewares(dp: Dispatcher, config: Settings):
     middlewares = [
         ConfigMiddleware(config),
+        ThrottlingMiddleware(),
         # DatabaseMiddleware(session_pool),
     ]
 
