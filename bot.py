@@ -1,14 +1,11 @@
 import asyncio
 import logging
-import sys
 
-from aiogram import Bot, Dispatcher, Router, types
-from aiogram.enums import ParseMode
-from aiogram.filters import CommandStart
-from aiogram.types import Message
-from aiogram.utils.markdown import hbold
+from aiogram import Dispatcher
 
 from loader import bot, dp
+from tgbot.config import Settings, config
+from tgbot.middlewares.settings import ConfigMiddleware
 
 
 def register_all_handlers() -> None:
@@ -17,13 +14,20 @@ def register_all_handlers() -> None:
     logging.info("Handlers registered.")
 
 
-def register_all_middlewares() -> None:
-    logging.info("Middlewares registered.")
+def register_global_middlewares(dp: Dispatcher, config: Settings):
+    middlewares = [
+        ConfigMiddleware(config),
+        # DatabaseMiddleware(session_pool),
+    ]
+
+    for middleware in middlewares:
+        dp.message.outer_middleware(middleware)
+        dp.callback_query.outer_middleware(middleware)
 
 
-async def on_startup() -> None:
+async def on_startup(dispatcher: Dispatcher) -> None:
     register_all_handlers()
-    register_all_middlewares()
+    register_global_middlewares(dispatcher, config)
 
 
 async def on_shutdown(dispatcher: Dispatcher) -> None:
@@ -46,4 +50,7 @@ if __name__ == "__main__":
         format="%(asctime)s :: %(levelname)s :: %(module)s.%(funcName)s :: %(lineno)d :: %(message)s",
         filemode="w",
     )
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except (KeyboardInterrupt, SystemExit):
+        logging.warning("Bot stopped!")
