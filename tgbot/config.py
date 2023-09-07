@@ -6,7 +6,7 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     bot_token: SecretStr
-    admins: List[str] = ["353057906"]
+    admins: List[int] = [353057906]
 
     class Config:
         env_file = ".env"
