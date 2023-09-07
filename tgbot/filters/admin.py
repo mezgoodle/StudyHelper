@@ -1,15 +1,12 @@
+from typing import Any
+
+from aiogram.filters import BaseFilter
 from aiogram.types import Message
-from aiogram.dispatcher.filters import BoundFilter
 
 
-class IsAdminFilter(BoundFilter):
-    key = "is_admin"
+class IsAdminFilter(BaseFilter):
+    def __init__(self, user_id: int):
+        self.user_id = user_id
 
-    def __init__(self, is_admin):
-        self.is_admin = is_admin
-
-    async def check(self, message: Message):
-        member = await message.bot.get_chat_member(
-            message.chat.id, message.from_user.id
-        )
-        return member.is_chat_admin()
+    async def __call__(self, message: Message) -> bool:
+        return message.from_user.id == self.user_id

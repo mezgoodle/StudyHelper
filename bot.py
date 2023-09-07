@@ -21,14 +21,9 @@ def register_all_middlewares() -> None:
     logging.info("Middlewares registered.")
 
 
-def register_all_filters() -> None:
-    logging.info("Filters registered.")
-
-
 async def on_startup() -> None:
     register_all_handlers()
     register_all_middlewares()
-    register_all_filters()
 
 
 async def on_shutdown(dispatcher: Dispatcher) -> None:

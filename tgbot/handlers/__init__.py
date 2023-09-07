@@ -1,1 +1,1 @@
-from . import echo  # noqa
+from . import admin, echo  # noqa
