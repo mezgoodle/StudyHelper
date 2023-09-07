@@ -9,7 +9,7 @@ from tgbot.middlewares.settings import ConfigMiddleware
 
 
 def register_all_handlers() -> None:
-    from tgbot import handlers
+    from tgbot import handlers  # noqa: F401
 
     logging.info("Handlers registered.")
 
@@ -47,7 +47,7 @@ if __name__ == "__main__":
     logging.basicConfig(
         level=logging.INFO,
         filename="bot.log",
-        format="%(asctime)s :: %(levelname)s :: %(module)s.%(funcName)s :: %(lineno)d :: %(message)s",
+        format="%(asctime)s :: %(levelname)s :: %(module)s.%(funcName)s :: %(lineno)d :: %(message)s",  # noqa: E501
         filemode="w",
     )
     try:
