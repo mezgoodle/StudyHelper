@@ -46,7 +46,7 @@ async def food_chosen_incorrectly(message: Message):
 async def food_size_chosen(message: Message, state: FSMContext):
     user_data = await state.get_data()
     await message.answer(
-        text=f"You have chose {message.text.lower()} portion {user_data['chosen_food']}.\n",
+        text=f"You have chose {message.text.lower()} portion {user_data['chosen_food']}.\n",  # noqa: E501
         reply_markup=ReplyKeyboardRemove(),
     )
     await state.clear()
