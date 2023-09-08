@@ -59,7 +59,8 @@ async def main() -> None:
     dp.shutdown.register(on_shutdown)
     # And the run events dispatching
     await dp.start_polling(bot)
-    # * For the webhook usage: https://docs.aiogram.dev/en/dev-3.x/dispatcher/webhook.html#examples
+    # * For the webhook usage:
+    # * https://docs.aiogram.dev/en/dev-3.x/dispatcher/webhook.html#examples
 
 
 if __name__ == "__main__":
