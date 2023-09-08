@@ -2,6 +2,7 @@ import asyncio
 import logging
 
 from aiogram import Dispatcher
+from aiogram.utils.callback_answer import CallbackAnswerMiddleware
 
 from loader import bot, dp
 from tgbot.config import Settings, config
@@ -25,6 +26,10 @@ def register_global_middlewares(dp: Dispatcher, config: Settings):
     for middleware in middlewares:
         dp.message.outer_middleware(middleware)
         dp.callback_query.outer_middleware(middleware)
+
+    dp.callback_query.middleware(
+        CallbackAnswerMiddleware(pre=True, text="Ready!", show_alert=True)
+    )
 
 
 async def on_startup(dispatcher: Dispatcher) -> None:
