@@ -6,8 +6,10 @@ from aiogram.utils.callback_answer import CallbackAnswerMiddleware
 
 from loader import bot, dp
 from tgbot.config import Settings, config
+from tgbot.middlewares.database import DatabaseMiddleware
 from tgbot.middlewares.settings import ConfigMiddleware
 from tgbot.middlewares.throttling import ThrottlingMiddleware
+from tgbot.misc.database import Database
 from tgbot.models.models import close_db, init
 from tgbot.services.admins_notify import on_startup_notify
 from tgbot.services.setting_commands import set_default_commands
@@ -28,7 +30,7 @@ def register_global_middlewares(dp: Dispatcher, config: Settings):
     middlewares = [
         ConfigMiddleware(config),
         ThrottlingMiddleware(),
-        # DatabaseMiddleware(session_pool),
+        DatabaseMiddleware(Database()),
     ]
 
     for middleware in middlewares:
