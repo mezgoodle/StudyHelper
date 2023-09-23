@@ -20,7 +20,8 @@ class Event(Model):
     id = fields.IntField(pk=True)
     name = fields.CharField(max_length=255)
     # References to other models are defined in format
-    # "{app_name}.{model_name}" - where {app_name} is defined in tortoise config
+    # "{app_name}.{model_name}" - where {app_name} is
+    # defined in tortoise config
     tournament = fields.ForeignKeyField(
         "models.Tournament", related_name="events"
     )
