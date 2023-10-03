@@ -9,15 +9,37 @@ router = Router()
 dp.include_router(router)
 
 
-@router.message(Command("teams"))
-async def get_teams_handler(message: Message, db: Database) -> None:
-    teams = await db.get_teams()
-    print(teams)
-    return await message.answer("Teams are printed")
+@router.message(Command("teachers"))
+async def get_teachers_handler(message: Message, db: Database) -> None:
+    teachers = await db.get_teachers()
+    print(teachers)
+    return await message.answer("Teachers are printed")
 
 
-@router.message(Command("create_team"))
-async def create_team_handler(message: Message, db: Database) -> None:
-    team_name = "test_team"
-    created_team = await db.create_team(team_name)
-    return await message.answer(f"Team {created_team} created")
+@router.message(Command("students"))
+async def get_students_handler(message: Message, db: Database) -> None:
+    students = await db.get_students()
+    print(students)
+    return await message.answer("Students are printed")
+
+
+@router.message(Command("create_teacher"))
+async def create_teacher_handler(message: Message, db: Database) -> None:
+    teacher = await db.create_teacher(
+        message.from_user.id,
+        message.from_user.username,
+        message.from_user.full_name,
+    )
+    print(teacher)
+    return await message.answer("Teacher created")
+
+
+@router.message(Command("create_student"))
+async def create_student_handler(message: Message, db: Database) -> None:
+    student = await db.create_student(
+        message.from_user.id,
+        message.from_user.username,
+        message.from_user.full_name,
+    )
+    print(student)
+    return await message.answer("Student created")
