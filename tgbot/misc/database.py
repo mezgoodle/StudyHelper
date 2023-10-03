@@ -39,7 +39,8 @@ class Database:
 
         Args:
             user_id (int): The ID of the user associated with the student.
-            username (str, optional): The username of the student. Defaults to None.
+            username (str, optional): The username of the student.
+                Defaults to None.
             name (str, optional): The name of the student. Defaults to None.
 
         Returns:
@@ -58,7 +59,8 @@ class Database:
         Creates a new user in the database.
 
         Args:
-            db_object (Student | Teacher): The database object used to create the user.
+            db_object (Student | Teacher): The database object
+                used to create the user.
             *args: Additional arguments passed to the create method.
 
         Returns:
