@@ -29,8 +29,7 @@ class Teacher(User):
 
 
 class Student(User):
-    completed_tasks: fields.ReverseRelation["CompletedTask"]
-    uncompleted_tasks: fields.ReverseRelation["UncompletedTask"]
+    tasks: fields.ReverseRelation["TaskStudent"]
 
 
 class Subject(TimedBaseModel):
@@ -51,7 +50,7 @@ class Subject(TimedBaseModel):
         null=True,
         description="Drive link",
     )
-    tasks: fields.ReverseRelation["Task"]
+    tasks: fields.ReverseRelation["SubjectTask"]
 
     def __str__(self):
         return self.name
@@ -60,9 +59,6 @@ class Subject(TimedBaseModel):
 class Task(TimedBaseModel):
     name = fields.CharField(max_length=255)
     description = fields.TextField()
-    subject: fields.ForeignKeyRelation[Subject] = fields.ForeignKeyField(
-        "models.Subject", related_name="tasks", description="Task subject"
-    )
     due_date = fields.DatetimeField(
         null=True,
     )
@@ -74,19 +70,34 @@ class Task(TimedBaseModel):
         abstract = True
 
 
-class UncompletedTask(Task):
-    student: fields.ForeignKeyRelation[Student] = fields.ForeignKeyField(
-        "models.Student",
-        related_name="uncompleted_tasks",
-        description="Task student",
+class SubjectTask(Task):
+    subject: fields.ForeignKeyRelation[Subject] = fields.ForeignKeyField(
+        "models.Subject", related_name="tasks", description="Task subject"
     )
 
 
-class CompletedTask(Task):
+class TaskStudent(TimedBaseModel):
+    subject_task: fields.ForeignKeyRelation[
+        SubjectTask
+    ] = fields.ForeignKeyField(
+        "models.SubjectTask",
+        related_name="students",
+        description="Task subject",
+        on_delete=fields.OnDelete.CASCADE,
+    )
+    grade = fields.IntField(
+        null=True,
+        description="Task grade",
+    )
     student: fields.ForeignKeyRelation[Student] = fields.ForeignKeyField(
         "models.Student",
-        related_name="completed_tasks",
+        related_name="tasks",
         description="Task student",
+        on_delete=fields.OnDelete.CASCADE,
+    )
+    completed = fields.BooleanField(
+        default=False,
+        description="Task completed",
     )
 
 

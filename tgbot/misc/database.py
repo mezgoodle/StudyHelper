@@ -1,11 +1,10 @@
-from tgbot.models.models import Student, Subject, Task, Teacher
+from tgbot.models.models import Student, Subject, Teacher
 
 
 class Database:
     def __init__(self):
         self.student = Student
         self.subject = Subject
-        self.task = Task
         self.teacher = Teacher
 
     def create_teacher(
@@ -24,7 +23,7 @@ class Database:
 
         Returns:
             The created teacher object.
-        """
+        """  # noqa: E501
         return self.__create_user(
             self.teacher, Teacher, user_id, username, name
         )
