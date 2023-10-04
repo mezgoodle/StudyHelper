@@ -1,1 +1,1 @@
-from . import admin, database, food, echo  # noqa
+from . import admin, teacher, commands, database, food, echo  # noqa

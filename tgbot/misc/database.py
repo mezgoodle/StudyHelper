@@ -7,7 +7,7 @@ class Database:
         self.subject = Subject
         self.teacher = Teacher
 
-    def create_teacher(
+    async def create_teacher(
         self,
         user_id: int,
         username: str | None = None,
@@ -24,11 +24,11 @@ class Database:
         Returns:
             The created teacher object.
         """  # noqa: E501
-        return self.__create_user(
-            self.teacher, Teacher, user_id, username, name
+        return await self.__create_user(
+            self.teacher, user_id=user_id, username=username, name=name
         )
 
-    def create_student(
+    async def create_student(
         self,
         user_id: int,
         username: str | None = None,
@@ -46,14 +46,14 @@ class Database:
         Returns:
             The created student object.
         """
-        return self.__create_user(
-            self.student, Student, user_id, username, name
+        return await self.__create_user(
+            self.student, user_id=user_id, username=username, name=name
         )
 
-    def __create_user(
+    async def __create_user(
         self,
         db_object: Student | Teacher,
-        *args,
+        **kwargs,
     ):
         """
         Creates a new user in the database.
@@ -66,10 +66,13 @@ class Database:
         Returns:
             The result of the create method.
         """
-        return db_object.create(*args)
+        return await db_object.create(**kwargs)
 
     def get_teachers(self) -> list[Teacher]:
         return self.teacher.all()
 
     def get_students(self) -> list[Student]:
         return self.student.all()
+
+    def get_teacher(self, user_id: int) -> Teacher | None:
+        return self.teacher.filter(user_id=user_id).first()
