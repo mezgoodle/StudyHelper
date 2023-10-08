@@ -8,6 +8,7 @@ from loader import dp
 from tgbot.filters.teacher import IsTeacherFilter
 from tgbot.keyboards.reply.options_keyboard import options_keyboard
 from tgbot.misc.database import Database
+from tgbot.models.models import Teacher
 from tgbot.states.states import Options, Subject
 
 router = Router()
@@ -58,13 +59,11 @@ async def set_subject_drive_link(message: Message, state: FSMContext) -> None:
 
 @router.message(F.text.casefold() == "yes", Options.option)
 async def accept_create(
-    message: Message, state: FSMContext, db: Database
+    message: Message, state: FSMContext, db: Database, teacher: Teacher
 ) -> None:
     subject_data = await state.get_data()
     await state.clear()
-    if await db.create_subject(
-        **subject_data, teacher_id=message.from_user.id
-    ):
+    if await db.create_subject(**subject_data, teacher_id=teacher.id):
         return await message.answer("Subject was created!")
     return await message.answer(
         "Do you want to create it?", reply_markup=options_keyboard()
@@ -80,5 +79,11 @@ async def decline_create(message: Message, state: FSMContext) -> None:
 
 
 @router.message(Command("my_subjects"))
-async def get_subjects(message: Message, db: Database) -> None:
-    subjects = await db.get_subjects_by_teacher_id(message.from_user.id)
+async def get_subjects(
+    message: Message, db: Database, teacher: Teacher
+) -> None:
+    if subjects := await db.get_subjects_by_teacher_id(teacher.id)
+        text = "\n".join([subject.name for subject in subjects])
+        # TODO: make subjects like a buttons with inline callbacks
+        return await message.answer(text)
+    return await message.answer("You don't have any subjects!")

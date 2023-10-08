@@ -124,7 +124,9 @@ class Database:
         """
         return self.teacher.filter(user_id=user_id).first()
 
-    def get_subjects_by_teacher_id(self, teacher_id: int) -> list[Subject]:
+    async def get_subjects_by_teacher_id(
+        self, teacher_id: int
+    ) -> list[Subject]:
         """
         Retrieves a list of subjects based on a given teacher ID.
 
@@ -134,4 +136,4 @@ class Database:
         Returns:
             list[Subject]: A list of Subject objects filtered by the given teacher ID.
         """
-        return self.subject.filter(teacher_id=teacher_id).all()
+        return await self.subject.filter(teacher_id=teacher_id).all()
