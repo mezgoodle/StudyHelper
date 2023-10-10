@@ -6,6 +6,9 @@
   <img alt="GitHub pull requests" src="https://img.shields.io/github/issues-pr/mezgoodle/bot_template?style=flat-square" />
   <img alt="GitHub closed pull requests" src="https://img.shields.io/github/issues-pr-closed/mezgoodle/bot_template?style=flat-square" />
   <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/mezgoodle/bot_template?style=flat-square">
+  <a href="https://codeium.com">
+  <img alt="Built with the Codeium" src="https://codeium.com/badges/main">
+  </a>
 </h1>
 
 <p align="center">

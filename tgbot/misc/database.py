@@ -7,7 +7,7 @@ class Database:
         self.subject = Subject
         self.teacher = Teacher
 
-    def create_teacher(
+    async def create_teacher(
         self,
         user_id: int,
         username: str | None = None,
@@ -24,11 +24,11 @@ class Database:
         Returns:
             The created teacher object.
         """  # noqa: E501
-        return self.__create_user(
-            self.teacher, Teacher, user_id, username, name
+        return await self.__create_user(
+            self.teacher, user_id=user_id, username=username, name=name
         )
 
-    def create_student(
+    async def create_student(
         self,
         user_id: int,
         username: str | None = None,
@@ -46,14 +46,14 @@ class Database:
         Returns:
             The created student object.
         """
-        return self.__create_user(
-            self.student, Student, user_id, username, name
+        return await self.__create_user(
+            self.student, user_id=user_id, username=username, name=name
         )
 
-    def __create_user(
+    async def __create_user(
         self,
         db_object: Student | Teacher,
-        *args,
+        **kwargs,
     ):
         """
         Creates a new user in the database.
@@ -66,10 +66,74 @@ class Database:
         Returns:
             The result of the create method.
         """
-        return db_object.create(*args)
+        return await db_object.create(**kwargs)
+
+    async def create_subject(
+        self, name: str, description: str, drive_link: str, teacher_id: int
+    ) -> Subject:
+        """
+        Creates a new subject with the given name, description, drive link,
+        and teacher ID.
+
+        Args:
+            name (str): The name of the subject.
+            description (str): The description of the subject.
+            drive_link (str): The Google Drive link associated with the subject.
+            teacher_id (int): The ID of the teacher responsible for the subject.
+
+        Returns:
+            Subject: The newly created Subject object.
+
+        Raises:
+            None
+        """
+        return await self.subject.create(
+            name=name,
+            description=description,
+            drive_link=drive_link,
+            teacher_id=teacher_id,
+        )
 
     def get_teachers(self) -> list[Teacher]:
+        """
+        Get the list of teachers.
+
+        :return: A list of Teacher objects.
+        """
         return self.teacher.all()
 
     def get_students(self) -> list[Student]:
+        """
+        Returns a list of all students.
+
+        :return: A list of Student objects representing all the students.
+        :rtype: list[Student]
+        """
         return self.student.all()
+
+    def get_teacher(self, user_id: int) -> Teacher | None:
+        """
+        Retrieves a teacher based on the provided user ID.
+
+        Parameters:
+            user_id (int): The ID of the user for which to retrieve the teacher.
+
+        Returns:
+            Teacher | None: The teacher object corresponding to the provided user ID,
+            or None if no teacher is found.
+        """
+        return self.teacher.filter(user_id=user_id).first()
+
+    async def get_subjects_by_teacher_id(
+        self, teacher_id: int
+    ) -> list[Subject]:
+        """
+        Retrieves a list of subjects based on a given teacher ID.
+
+        Args:
+            teacher_id (int): The ID of the teacher.
+
+        Returns:
+            list[Subject]: A list of Subject objects filtered by the given teacher ID.
+        """
+        return await self.subject.filter(teacher_id=teacher_id).all()
