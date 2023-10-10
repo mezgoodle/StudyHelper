@@ -6,6 +6,7 @@ from aiogram.utils.markdown import hbold
 
 from loader import dp
 from tgbot.filters.teacher import IsTeacherFilter
+from tgbot.keyboards.inline.subjects_keyboard import subject_markup
 from tgbot.keyboards.reply.options_keyboard import options_keyboard
 from tgbot.misc.database import Database
 from tgbot.models.models import Teacher
@@ -82,8 +83,10 @@ async def decline_create(message: Message, state: FSMContext) -> None:
 async def get_subjects(
     message: Message, db: Database, teacher: Teacher
 ) -> None:
-    if subjects := await db.get_subjects_by_teacher_id(teacher.id)
-        text = "\n".join([subject.name for subject in subjects])
-        # TODO: make subjects like a buttons with inline callbacks
-        return await message.answer(text)
+    if subjects := await db.get_subjects_by_teacher_id(teacher.id):
+        keyboard = subject_markup(subjects)
+        await message.answer("Here are your subjects:", reply_markup=keyboard)
+        return await message.answer(
+            "Click on the subject you want to see the details"
+        )
     return await message.answer("You don't have any subjects!")
