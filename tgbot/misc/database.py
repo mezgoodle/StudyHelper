@@ -124,6 +124,19 @@ class Database:
         """
         return self.teacher.filter(user_id=user_id).first()
 
+    def get_student(self, user_id: int) -> Student | None:
+        """
+        Retrieves a student based on the provided user ID.
+
+        Parameters:
+            user_id (int): The ID of the user for which to retrieve the student.
+
+        Returns:
+            Student | None: The student object corresponding to the provided user ID,
+            or None if no student is found.
+        """
+        return self.student.filter(user_id=user_id).first()
+
     async def get_subjects_by_teacher_id(
         self, teacher_id: int
     ) -> list[Subject]:
@@ -137,3 +150,15 @@ class Database:
             list[Subject]: A list of Subject objects filtered by the given teacher ID.
         """
         return await self.subject.filter(teacher_id=teacher_id).all()
+
+    async def get_student_subjects(self, student: Student) -> list[Subject]:
+        """
+        Retrieves a list of subjects based on a given student ID.
+
+        Args:
+            student (Student): The Student object
+
+        Returns:
+            list[Subject]: A list of Subject objects filtered by the given student ID.
+        """
+        return await student.subjects
