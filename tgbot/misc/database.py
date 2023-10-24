@@ -124,6 +124,19 @@ class Database:
         """
         return self.teacher.filter(user_id=user_id).first()
 
+    def get_subject(self, subject_id: int) -> Subject | None:
+        """
+        Retrieves a subject based on the provided subject ID.
+
+        Parameters:
+            subject_id (int): The ID of the subject for which to retrieve the subject.
+
+        Returns:
+            Subject | None: The subject object corresponding to the provided subject ID,
+            or None if no subject is found.
+        """
+        return self.subject.filter(id=subject_id).first()
+
     def get_student(self, user_id: int) -> Student | None:
         """
         Retrieves a student based on the provided user ID.

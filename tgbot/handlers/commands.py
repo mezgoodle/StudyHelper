@@ -7,6 +7,7 @@ from aiogram.utils.deep_linking import decode_payload
 
 from loader import dp
 from tgbot.misc.database import Database
+from tgbot.misc.utils import utils
 
 router = Router()
 dp.include_router(router)
@@ -39,9 +40,12 @@ async def register_as_student(message: Message, db: Database) -> None:
 
 
 @router.message(CommandStart(deep_link=True))
-async def handler(message: Message, command: CommandObject) -> Message:
+async def handler(
+    message: Message, command: CommandObject, db: Database
+) -> Message:
     args = command.args
     payload = decode_payload(args)
-    data = loads(payload)
-    print(data)
-    return await message.answer(f"Your payload: {payload}")
+    data: dict = loads(payload)
+    if (key := data.get("key")) and key in utils:
+        result = await utils.get(key)(message, data, db)
+        return await message.answer(result)
