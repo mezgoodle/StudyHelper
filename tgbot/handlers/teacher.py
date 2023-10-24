@@ -6,9 +6,9 @@ from aiogram.utils.markdown import hbold
 
 from loader import dp
 from tgbot.filters.teacher import IsTeacherFilter
-from tgbot.keyboards.inline.subjects_keyboard import subject_markup
 from tgbot.keyboards.reply.options_keyboard import options_keyboard
 from tgbot.misc.database import Database
+from tgbot.misc.utils import create_subject_message
 from tgbot.models.models import Teacher
 from tgbot.states.states import Options, Subject
 
@@ -84,8 +84,9 @@ async def get_subjects(
     message: Message, db: Database, teacher: Teacher
 ) -> None:
     if subjects := await db.get_subjects_by_teacher_id(teacher.id):
-        keyboard = subject_markup(subjects)
-        await message.answer("Here are your subjects:", reply_markup=keyboard)
+        text = await create_subject_message(subjects)
+        await message.answer("Here are your subjects:")
+        await message.answer(text)
         return await message.answer(
             "Click on the subject you want to see the details"
         )

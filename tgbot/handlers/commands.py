@@ -1,6 +1,9 @@
+from json import loads
+
 from aiogram import Router
-from aiogram.filters import Command
+from aiogram.filters import Command, CommandObject, CommandStart
 from aiogram.types import Message
+from aiogram.utils.deep_linking import decode_payload
 
 from loader import dp
 from tgbot.misc.database import Database
@@ -33,3 +36,12 @@ async def register_as_student(message: Message, db: Database) -> None:
             "You are registered as a student. To check it, type /is_student"
         )
     return await message.answer("Error while registering as a student")
+
+
+@router.message(CommandStart(deep_link=True))
+async def handler(message: Message, command: CommandObject) -> Message:
+    args = command.args
+    payload = decode_payload(args)
+    data = loads(payload)
+    print(data)
+    return await message.answer(f"Your payload: {payload}")
