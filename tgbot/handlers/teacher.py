@@ -87,7 +87,5 @@ async def get_subjects(
         text = await create_subject_message(subjects)
         await message.answer("Here are your subjects:")
         await message.answer(text)
-        return await message.answer(
-            "Click on the subject you want to see the details"
-        )
+        return await message.answer("Click on the subject actions")
     return await message.answer("You don't have any subjects!")
