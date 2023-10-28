@@ -9,13 +9,19 @@ from tgbot.misc.database import Database
 from tgbot.models.models import Subject
 
 
-async def create_subject_message(subjects: list[Subject]) -> str:
+async def create_subject_message(
+    subjects: list[Subject], link_text: str, method: str
+) -> str:
     """Makes a message with a list of subjects and links to act on them.
 
     Parameters
     ----------
     subjects : list[Subject]
         List of subjects
+    link_text : str
+        Text for the link
+    method : str
+        Method for the link
 
     Returns
     -------
@@ -24,21 +30,21 @@ async def create_subject_message(subjects: list[Subject]) -> str:
     """
     rows = []
     for subject in subjects:
-        link = await create_link(subject.id)
-        rows.append(
-            f"{subject.id}. {subject.name}. {hlink('Invite students',link)}"
-        )
+        link = await create_link(subject.id, method)
+        rows.append(f"{subject.id}. {subject.name}. {hlink(link_text, link)}")
 
     return "\n".join(rows)
 
 
-async def create_link(subject_id: int, key: str = "add_subject") -> str:
+async def create_link(subject_id: int, key: str) -> str:
     """Creates a link to act on a subject
 
     Parameters
     ----------
     subject_id : int
         ID of the subject
+    key : str
+        Name of the method
 
     Returns
     -------
