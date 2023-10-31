@@ -13,20 +13,6 @@ async def create_subject_message(
     subjects: list[Subject],
     methods: list[dict[str, str]],
 ) -> str:
-    """Makes a message with a list of subjects and links to act on them.
-
-    Parameters
-    ----------
-    subjects : list[Subject]
-        List of subjects
-    methods : list[dict[str, str]]
-        List of methods, where are the names of the methods and link_texts
-
-    Returns
-    -------
-    str
-        Message with a list of subjects and links to act on them.
-    """
     rows = []
     for subject in subjects:
         links = []
@@ -43,20 +29,6 @@ async def create_subject_message(
 
 
 async def create_link(subject_id: int, key: str) -> str:
-    """Creates a link to act on a subject
-
-    Parameters
-    ----------
-    subject_id : int
-        ID of the subject
-    key : str
-        Name of the method
-
-    Returns
-    -------
-    str
-        Link to act on a subject with dumped data
-    """
     return await create_start_link(
         bot, dumps({"key": key, "id": subject_id}), True
     )
@@ -65,22 +37,6 @@ async def create_link(subject_id: int, key: str) -> str:
 async def add_student_to_subject(
     message: Message, payload: dict, db: Database
 ) -> str:
-    """Adds a student to a subject
-
-    Parameters
-    ----------
-    message : Message
-        Telegram message
-    payload : dict
-        Payload from the deep link
-    db : Database
-        instance of Database
-
-    Returns
-    -------
-    str
-        Result message
-    """
     if (subject := await db.get_subject(payload.get("id"))) and (
         student := await db.get_student(message.from_user.id)
     ):
@@ -89,6 +45,18 @@ async def add_student_to_subject(
     return "Subject or student not found"
 
 
+async def quit_student_to_subject(
+    message: Message, payload: dict, db: Database
+) -> str:
+    if (subject := await db.get_subject(payload.get("id"))) and (
+        student := await db.get_student(message.from_user.id)
+    ):
+        await subject.students.remove(student)
+        return f'You are now not a student of "{subject.name}"'
+    return "Subject or student not found"
+
+
 utils = {
     "add_subject": add_student_to_subject,
+    "quit_subject": quit_student_to_subject,
 }
