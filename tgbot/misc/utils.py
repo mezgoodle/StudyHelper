@@ -10,7 +10,8 @@ from tgbot.models.models import Subject
 
 
 async def create_subject_message(
-    subjects: list[Subject], link_text: str, method: str
+    subjects: list[Subject],
+    methods: list[dict[str, str]],
 ) -> str:
     """Makes a message with a list of subjects and links to act on them.
 
@@ -18,10 +19,8 @@ async def create_subject_message(
     ----------
     subjects : list[Subject]
         List of subjects
-    link_text : str
-        Text for the link
-    method : str
-        Method for the link
+    methods : list[dict[str, str]]
+        List of methods, where are the names of the methods and link_texts
 
     Returns
     -------
@@ -30,8 +29,15 @@ async def create_subject_message(
     """
     rows = []
     for subject in subjects:
-        link = await create_link(subject.id, method)
-        rows.append(f"{subject.id}. {subject.name}. {hlink(link_text, link)}")
+        links = []
+        for method in methods:
+            links.append(
+                hlink(
+                    method.get("text"),
+                    await create_link(subject.id, method.get("name")),
+                )
+            )
+        rows.append(f"{subject.id}. {subject.name}. {', '.join(links)}")
 
     return "\n".join(rows)
 

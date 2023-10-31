@@ -24,7 +24,8 @@ async def get_subjects(
 ) -> None:
     if subjects := await db.get_student_subjects(student):
         text = await create_subject_message(
-            subjects, "Quit from subject", "quit_subject"
+            subjects,
+            [{"text": "Quit from subject", "name": "quit_subject"}],
         )
         await message.answer("Here are your subjects:")
         return await message.answer(text)
