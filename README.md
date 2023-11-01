@@ -9,6 +9,9 @@
   <a href="https://codeium.com">
   <img alt="Built with the Codeium" src="https://codeium.com/badges/main">
   </a>
+  <a href="https://sonarcloud.io/dashboard?id=mezgoodle_StudyHepler">
+  <img alt="Quality gate" src="https://sonarcloud.io/api/project_badges/quality_gate?project=mezgoodle_StudyHepler">
+  </a>
 </h1>
 
 <p align="center">
