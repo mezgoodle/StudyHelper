@@ -85,7 +85,11 @@ async def get_subjects(
 ) -> None:
     if subjects := await db.get_subjects_by_teacher_id(teacher.id):
         text = await create_subject_message(
-            subjects, [{"text": "Invite students", "name": "add_subject"}]
+            subjects,
+            [
+                {"text": "Invite students", "name": "add_subject"},
+                {"text": "Add task", "name": "add_task"},
+            ],
         )
         await message.answer("Here are your subjects:")
         await message.answer(text)

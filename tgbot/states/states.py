@@ -14,3 +14,9 @@ class Subject(StatesGroup):
 
 class Options(StatesGroup):
     option = State()
+
+
+class Task(StatesGroup):
+    name = State()
+    description = State()
+    due_date = State()

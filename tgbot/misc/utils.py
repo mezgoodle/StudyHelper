@@ -1,5 +1,6 @@
 from json import dumps
 
+from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 from aiogram.utils.deep_linking import create_start_link
 from aiogram.utils.markdown import hlink
@@ -7,6 +8,7 @@ from aiogram.utils.markdown import hlink
 from loader import bot
 from tgbot.misc.database import Database
 from tgbot.models.models import Subject
+from tgbot.states.states import Task
 
 
 async def create_subject_message(
@@ -35,7 +37,7 @@ async def create_link(subject_id: int, key: str) -> str:
 
 
 async def add_student_to_subject(
-    message: Message, payload: dict, db: Database
+    message: Message, payload: dict, db: Database, *args, **kwargs
 ) -> str:
     if (subject := await db.get_subject(payload.get("id"))) and (
         student := await db.get_student(message.from_user.id)
@@ -46,7 +48,7 @@ async def add_student_to_subject(
 
 
 async def quit_student_to_subject(
-    message: Message, payload: dict, db: Database
+    message: Message, payload: dict, db: Database, *args, **kwargs
 ) -> str:
     if (subject := await db.get_subject(payload.get("id"))) and (
         student := await db.get_student(message.from_user.id)
@@ -56,7 +58,24 @@ async def quit_student_to_subject(
     return "Subject or student not found"
 
 
+async def add_task(
+    message: Message,
+    payload: dict,
+    db: Database,
+    state: FSMContext,
+    *args,
+    **kwargs,
+) -> None:
+    if (
+        subject := await db.get_subject(payload.get("id"))
+    ) and subject.teacher.user_id == message.from_user.id:
+        await state.set_state(Task.name)
+        return await message.answer("Write a name for task")
+    return await message.answer("You are not a teacher of this subject")
+
+
 utils = {
     "add_subject": add_student_to_subject,
     "quit_subject": quit_student_to_subject,
+    "add_task": add_task,
 }
