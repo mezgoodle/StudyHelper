@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from aiogram import F, Router
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
@@ -10,7 +12,7 @@ from tgbot.keyboards.reply.options_keyboard import options_keyboard
 from tgbot.misc.database import Database
 from tgbot.misc.utils import create_subject_message
 from tgbot.models.models import Teacher
-from tgbot.states.states import Options, Subject
+from tgbot.states.states import Options, Subject, Task
 
 router = Router()
 router.message.filter(IsTeacherFilter())
@@ -43,10 +45,15 @@ async def set_subject_description(message: Message, state: FSMContext) -> None:
 
 
 @router.message(Subject.drive_link)
-async def set_subject_drive_link(message: Message, state: FSMContext) -> None:
+async def set_subject_drive_link(
+    message: Message, state: FSMContext, db: Database, teacher: Teacher
+) -> None:
     await state.update_data(drive_link=message.text)
     subject_data = await state.get_data()
     await state.set_state(Options.option)
+    await state.update_data(
+        {"method": db.create_subject, "teacher_id": teacher.id}
+    )
     await message.answer(
         f"Your subject:\n"
         f"{hbold('Name')}: {subject_data.get('name')}\n"
@@ -59,23 +66,55 @@ async def set_subject_drive_link(message: Message, state: FSMContext) -> None:
 
 
 @router.message(F.text.casefold() == "yes", Options.option)
-async def accept_create(
-    message: Message, state: FSMContext, db: Database, teacher: Teacher
-) -> None:
-    subject_data = await state.get_data()
+async def accept_create(message: Message, state: FSMContext) -> None:
+    data = await state.get_data()
+    db_method = data.pop("method")
     await state.clear()
-    if await db.create_subject(**subject_data, teacher_id=teacher.id):
-        return await message.answer("Subject was created!")
-    return await message.answer(
-        "Do you want to create it?", reply_markup=options_keyboard()
-    )
+    if await db_method(**data):
+        return await message.answer("Object was created!")
+    return await message.answer("Object was not created. Try again.")
 
 
 @router.message(Options.option, F.text.casefold() == "no")
 async def decline_create(message: Message, state: FSMContext) -> None:
     await state.clear()
+    return await message.answer("Object was not created. Try again.")
+
+
+@router.message(Task.name)
+async def set_task_name(message: Message, state: FSMContext) -> None:
+    await state.update_data(name=message.text)
+    await state.set_state(Task.description)
+    return await message.answer("Write a description for subject")
+
+
+@router.message(Task.description)
+async def set_task_description(message: Message, state: FSMContext) -> None:
+    await state.update_data(description=message.text)
+    await state.set_state(Task.due_date)
     return await message.answer(
-        "Subject was not created. To start again, write /create_subject"
+        "Please, write a due date in format dd/mm/yyyy"
+    )
+
+
+@router.message(Task.due_date)
+async def set_task_due_date(
+    message: Message, state: FSMContext, db: Database
+) -> None:
+    await state.update_data(
+        due_date=datetime.strptime(message.text, "%d/%m/%Y")
+    )
+    task_data = await state.get_data()
+    await state.set_state(Options.option)
+    await state.update_data({"method": db.create_subject_task})
+    await message.answer(
+        f"Your task:\n"
+        f"{hbold('Name')}: {task_data.get('name')}\n"
+        f"{hbold('Description')}: {task_data.get('description')}\n"
+        f"{hbold('Due date')}: {task_data.get('due_date')}"
+    )
+    return await message.answer(
+        "Do you want to create it?", reply_markup=options_keyboard()
     )
 
 

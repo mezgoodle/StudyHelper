@@ -67,11 +67,14 @@ async def add_task(
     **kwargs,
 ) -> None:
     if (
-        subject := await db.get_subject(payload.get("id"))
-    ) and subject.teacher.user_id == message.from_user.id:
+        (subject := await db.get_subject(payload.get("id")))
+        and (teacher := await subject.teacher)
+        and teacher.user_id == message.from_user.id
+    ):
         await state.set_state(Task.name)
-        return await message.answer("Write a name for task")
-    return await message.answer("You are not a teacher of this subject")
+        await state.update_data(subject_id=subject.id)
+        return "Write a name for task"
+    return "You are not a teacher of this subject"
 
 
 utils = {

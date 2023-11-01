@@ -1,4 +1,4 @@
-from tgbot.models.models import Student, Subject, Teacher
+from tgbot.models.models import Student, Subject, SubjectTask, Teacher
 
 
 class Database:
@@ -6,6 +6,7 @@ class Database:
         self.student = Student
         self.subject = Subject
         self.teacher = Teacher
+        self.subjecttask = SubjectTask
 
     async def create_teacher(
         self,
@@ -36,12 +37,27 @@ class Database:
 
     async def create_subject(
         self, name: str, description: str, drive_link: str, teacher_id: int
-    ) -> Subject:
+    ) -> Subject | None:
         return await self.subject.create(
             name=name,
             description=description,
             drive_link=drive_link,
             teacher_id=teacher_id,
+        )
+
+    async def create_subject_task(
+        self,
+        name: str,
+        description: str,
+        due_date: str,
+        subject_id: int,
+    ) -> SubjectTask | None:
+        subject = await self.get_subject(subject_id)
+        return await self.subjecttask.create(
+            name=name,
+            description=description,
+            due_date=due_date,
+            subject=subject,
         )
 
     def get_teachers(self) -> list[Teacher]:
