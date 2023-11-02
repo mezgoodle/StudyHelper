@@ -2,6 +2,7 @@ from json import loads
 
 from aiogram import Router
 from aiogram.filters import Command, CommandObject, CommandStart
+from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 from aiogram.utils.deep_linking import decode_payload
 
@@ -41,11 +42,11 @@ async def register_as_student(message: Message, db: Database) -> None:
 
 @router.message(CommandStart(deep_link=True))
 async def handler(
-    message: Message, command: CommandObject, db: Database
+    message: Message, command: CommandObject, db: Database, state: FSMContext
 ) -> Message:
     args = command.args
     payload = decode_payload(args)
     data: dict = loads(payload)
     if (key := data.get("key")) and key in utils:
-        result = await utils.get(key)(message, data, db)
+        result = await utils.get(key)(message, data, db, state)
         return await message.answer(result)
