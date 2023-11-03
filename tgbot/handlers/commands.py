@@ -48,5 +48,5 @@ async def handler(
     payload = decode_payload(args)
     data: dict = loads(payload)
     if (key := data.get("key")) and key in utils:
-        result = await utils.get(key)(message, data, db, state)
-        return await message.answer(result)
+        return await utils.get(key)(message, data, db, state)
+    return await message.answer("Unknown command")
