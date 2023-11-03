@@ -96,25 +96,6 @@ async def add_task(
     return await message.answer("You are not a teacher of this subject")
 
 
-async def add_task(
-    message: Message,
-    payload: dict,
-    db: Database,
-    state: FSMContext,
-    *args,
-    **kwargs,
-) -> None:
-    if (
-        (subject := await db.get_subject(payload.get("id")))
-        and (teacher := await subject.teacher)
-        and teacher.user_id == message.from_user.id
-    ):
-        await state.set_state(Task.name)
-        await state.update_data(subject_id=subject.id)
-        return "Write a name for task"
-    return "You are not a teacher of this subject"
-
-
 utils = {
     "add_subject": add_student_to_subject,
     "quit_subject": quit_student_to_subject,
