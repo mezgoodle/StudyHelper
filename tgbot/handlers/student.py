@@ -19,13 +19,14 @@ async def check_student(message: Message) -> None:
 
 
 @router.message(Command("my_subjects"))
-async def get_subjects(
-    message: Message, db: Database, student: Student
-) -> None:
+async def get_subjects(message: Message, db: Database, student: Student) -> None:
     if subjects := await db.get_student_subjects(student):
         text = await create_subject_message(
             subjects,
-            [{"text": "Quit from subject", "name": "quit_subject"}],
+            [
+                {"text": "Quit from subject", "name": "quit_subject"},
+                {"text": "See tasks", "name": "see_tasks"},
+            ],
         )
         await message.answer("Here are your subjects:")
         return await message.answer(text)
