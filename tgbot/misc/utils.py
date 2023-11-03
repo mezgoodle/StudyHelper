@@ -3,9 +3,10 @@ from json import dumps
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 from aiogram.utils.deep_linking import create_start_link
-from aiogram.utils.markdown import hlink
+from aiogram.utils.markdown import hbold, hlink
 
 from loader import bot
+from tgbot.keyboards.inline.task_keyboard import task_keyboard
 from tgbot.misc.database import Database
 from tgbot.models.models import Subject
 from tgbot.states.states import Task
@@ -66,8 +67,14 @@ async def see_tasks(
     if (subject := await db.get_subject(payload.get("id"))) and (
         tasks := await subject.tasks
     ):
-        print(tasks)
-        return await message.answer("Write a name for task")
+        for task in tasks:
+            await message.answer(
+                f"{hbold('Name')}: {task.name}\n"
+                f"{hbold('Description')}: {task.description}\n"
+                f"{hbold('Due date')}: {task.due_date}",
+                reply_markup=task_keyboard(subject.id, task.id),
+            )
+        return await message.answer("Here are your tasks")
     return await message.answer("There are no tasks in this subject")
 
 
