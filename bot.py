@@ -37,9 +37,9 @@ def register_global_middlewares(dp: Dispatcher, config: Settings):
         dp.message.outer_middleware(middleware)
         dp.callback_query.outer_middleware(middleware)
 
-    dp.callback_query.middleware(
-        CallbackAnswerMiddleware(pre=True, text="Ready!", show_alert=True)
-    )
+    # dp.callback_query.middleware(
+    #     CallbackAnswerMiddleware(pre=True, text="Ready!", show_alert=True)
+    # )
     logging.info("Middlewares registered.")
 
 
