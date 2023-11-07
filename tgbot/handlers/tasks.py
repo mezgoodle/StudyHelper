@@ -6,7 +6,6 @@ from loader import dp
 from tgbot.filters.student import IsStudentFilter
 from tgbot.keyboards.inline.callbacks import TaskCallbackFactory
 from tgbot.misc.database import Database
-from tgbot.models.models import Student
 from tgbot.states.states import Solution
 
 router = Router()
@@ -20,16 +19,20 @@ async def create_solution(
     callback: CallbackQuery,
     callback_data: TaskCallbackFactory,
     state: FSMContext,
-    student: Student,
 ) -> Message:
     await state.set_state(Solution.file_link)
     await state.update_data(
-        {"subject_id": callback_data.subject_id, "student_id": student.id}
+        {"subject_id": callback_data.subject_id, "student_id": callback.from_user.id}
     )
-    return await callback.answer("Task created")
+    await callback.message.answer("Send a file(pdf or docx)")
+    return await callback.answer()
 
 
-@router.message(Solution.file_link, F.document)
+@router.message(
+    Solution.file_link,
+    F.document & F.document.file_name.endswith(".pdf")
+    | F.document.file_name.endswith(".docx"),
+)
 async def set_solution_file_link(
     message: Message, state: FSMContext, db: Database, bot: Bot
 ) -> Message:
