@@ -49,7 +49,8 @@ class Database:
     async def create_solution(
         self, subject_id: int, student_id: int, file_link: str
     ) -> Solution | None:
-        subject_task = await self.subjecttask.filter(subject=subject_id).first()
+        subject = await self.get_subject(subject_id)
+        subject_task = await self.subjecttask.filter(subject=subject).first()
         student = await self.get_student(student_id)
         return await self.solution.create(
             subject_task=subject_task, student=student, file_link=file_link
