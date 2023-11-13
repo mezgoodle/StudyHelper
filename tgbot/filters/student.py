@@ -1,5 +1,5 @@
 from aiogram.filters import BaseFilter
-from aiogram.types import Message
+from aiogram.types import CallbackQuery, Message
 
 from tgbot.misc.database import Database, Student
 
@@ -9,8 +9,8 @@ class IsStudentFilter(BaseFilter):
         super().__init__()
 
     async def __call__(
-        self, message: Message, db: Database
+        self, event: Message | CallbackQuery, db: Database
     ) -> bool | dict[str, Student]:
-        if student := await db.get_student(message.from_user.id):
+        if student := await db.get_student(event.from_user.id):
             return {"student": student}
         return False

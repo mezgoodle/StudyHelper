@@ -29,7 +29,7 @@ class Teacher(User):
 
 
 class Student(User):
-    tasks: fields.ReverseRelation["TaskStudent"]
+    solutions: fields.ReverseRelation["Solution"]
 
 
 class Subject(TimedBaseModel):
@@ -76,10 +76,8 @@ class SubjectTask(Task):
     )
 
 
-class TaskStudent(TimedBaseModel):
-    subject_task: fields.ForeignKeyRelation[
-        SubjectTask
-    ] = fields.ForeignKeyField(
+class Solution(TimedBaseModel):
+    subject_task: fields.ForeignKeyRelation[SubjectTask] = fields.ForeignKeyField(
         "models.SubjectTask",
         related_name="students",
         description="Task subject",
@@ -88,6 +86,7 @@ class TaskStudent(TimedBaseModel):
     grade = fields.IntField(
         null=True,
         description="Task grade",
+        default=0,
     )
     student: fields.ForeignKeyRelation[Student] = fields.ForeignKeyField(
         "models.Student",
@@ -95,9 +94,10 @@ class TaskStudent(TimedBaseModel):
         description="Task student",
         on_delete=fields.OnDelete.CASCADE,
     )
-    completed = fields.BooleanField(
-        default=False,
-        description="Task completed",
+    file_link = fields.CharField(
+        max_length=255,
+        null=True,
+        description="Task file link",
     )
 
 

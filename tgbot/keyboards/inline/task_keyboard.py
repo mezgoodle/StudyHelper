@@ -1,7 +1,7 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-from tgbot.keyboards.inline.callbacks import TaskCallbackData
+from tgbot.keyboards.inline.callbacks import TaskCallbackFactory
 
 TASK_BUTTONS = [
     {"text": "Create a solution", "action_text": "create"},
@@ -16,7 +16,7 @@ def task_keyboard(subject_id: int, task_id: int) -> InlineKeyboardMarkup:
         *[
             InlineKeyboardButton(
                 text=item.get("text"),
-                callback_data=TaskCallbackData(
+                callback_data=TaskCallbackFactory(
                     subject_id=subject_id,
                     task_id=task_id,
                     action=item.get("action_text"),

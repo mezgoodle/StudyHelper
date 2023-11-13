@@ -2,7 +2,7 @@ from typing import Any, Awaitable, Callable, Dict
 
 from aiogram import BaseMiddleware
 from aiogram.dispatcher.flags import get_flag
-from aiogram.types import Message
+from aiogram.types import CallbackQuery, Message
 from cachetools import TTLCache
 
 THROTTLE_TIME_OTHER = 1
@@ -16,13 +16,17 @@ class ThrottlingMiddleware(BaseMiddleware):
     async def __call__(
         self,
         handler: Callable[[Message, Dict[str, Any]], Awaitable[Any]],
-        event: Message,
+        event: Message | CallbackQuery,
         data: Dict[str, Any],
     ) -> Any:
         throttling_key = get_flag(
             handler=data, name="throttling_key", default="default"
         )
-        if throttling_key is not None and throttling_key in self.caches:
+        if (
+            throttling_key is not None
+            and throttling_key in self.caches
+            and isinstance(event, Message)
+        ):
             if event.chat.id in self.caches[throttling_key]:
                 return
             else:

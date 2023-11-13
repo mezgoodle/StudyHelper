@@ -92,6 +92,7 @@ async def add_task(
         and teacher.user_id == message.from_user.id
     ):
         await state.set_state(Task.name)
+        await state.update_data(subject_id=subject.id)
         return await message.answer("Write a name for task")
     return await message.answer("You are not a teacher of this subject")
 
