@@ -12,7 +12,7 @@ from tgbot.keyboards.inline.callbacks import TaskCallbackFactory
 from tgbot.keyboards.reply.options_keyboard import options_keyboard
 from tgbot.misc.database import Database
 from tgbot.misc.utils import create_subject_message
-from tgbot.models.models import Teacher
+from tgbot.models.models import Solution, Teacher
 from tgbot.states.states import Options, Subject, Task
 
 router = Router()
@@ -147,15 +147,19 @@ async def show_solutions_for_task(
     state: FSMContext,
     db: Database,
 ) -> Message:
-    print(await db.get_solutions_for_task(callback_data.task_id))
-    await callback.message.answer("Hello")
+    solutions: list[Solution] = await db.get_solutions_for_task(
+        callback_data.task_id
+    )
+    if not solutions:
+        await callback.message.answer("No solutions")
+    else:
+        for solution in solutions:
+            text = "\n".join(
+                [
+                    f"{hbold('Student')}: {solution.student.name}",
+                    f"{hbold('Grade')}: {solution.grade}",
+                    f"{hbold('File link')}: {solution.file_link}",
+                ]
+            )
+            await callback.message.answer(text)
     return await callback.answer()
-    # await state.set_state(Solution.file_link)
-    # await state.update_data(
-    #     {
-    #         "subject_id": callback_data.subject_id,
-    #         "student_id": callback.from_user.id,
-    #     }
-    # )
-    # await callback.message.answer("Send a file(pdf or docx)")
-    # return )
