@@ -2,6 +2,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
 from tgbot.keyboards.inline.callbacks import TaskCallbackFactory
+from tgbot.misc.database import Database
 
 TASK_BUTTONS = [
     {"text": "Create a solution", "action_text": "create"},
@@ -10,7 +11,14 @@ TASK_BUTTONS = [
 ]
 
 
-def task_keyboard(subject_id: int, task_id: int) -> InlineKeyboardMarkup:
+async def task_keyboard(
+    subject_id: int, task_id: int, user_id: int, db: Database
+) -> InlineKeyboardMarkup:
+    buttons_list = TASK_BUTTONS
+    if await db.is_teacher(user_id):
+        buttons_list = [
+            {"text": "See solutions", "action_text": "show_solutions"},
+        ]
     keyboard = InlineKeyboardBuilder()
     keyboard.row(
         *[
@@ -22,7 +30,7 @@ def task_keyboard(subject_id: int, task_id: int) -> InlineKeyboardMarkup:
                     action=item.get("action_text"),
                 ).pack(),
             )
-            for item in TASK_BUTTONS
+            for item in buttons_list
         ]
     )
     return keyboard.as_markup()

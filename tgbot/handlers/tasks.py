@@ -22,10 +22,34 @@ async def create_solution(
 ) -> Message:
     await state.set_state(Solution.file_link)
     await state.update_data(
-        {"subject_id": callback_data.subject_id, "student_id": callback.from_user.id}
+        {
+            "subject_id": callback_data.subject_id,
+            "student_id": callback.from_user.id,
+        }
     )
     await callback.message.answer("Send a file(pdf or docx)")
     return await callback.answer()
+
+
+@router.callback_query(
+    TaskCallbackFactory.filter(F.action == "show_solutions")
+)
+async def show_solutions(
+    callback: CallbackQuery,
+    callback_data: TaskCallbackFactory,
+    state: FSMContext,
+) -> Message:
+    await callback.message.answer("Hello")
+    return await callback.answer()
+    # await state.set_state(Solution.file_link)
+    # await state.update_data(
+    #     {
+    #         "subject_id": callback_data.subject_id,
+    #         "student_id": callback.from_user.id,
+    #     }
+    # )
+    # await callback.message.answer("Send a file(pdf or docx)")
+    # return )
 
 
 @router.message(

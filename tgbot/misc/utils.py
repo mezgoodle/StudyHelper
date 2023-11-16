@@ -32,7 +32,9 @@ async def create_subject_message(
 
 
 async def create_link(subject_id: int, key: str) -> str:
-    return await create_start_link(bot, dumps({"key": key, "id": subject_id}), True)
+    return await create_start_link(
+        bot, dumps({"key": key, "id": subject_id}), True
+    )
 
 
 async def add_student_to_subject(
@@ -42,7 +44,9 @@ async def add_student_to_subject(
         student := await db.get_student(message.from_user.id)
     ):
         await subject.students.add(student)
-        return await message.answer(f'You are now a student of "{subject.name}"')
+        return await message.answer(
+            f'You are now a student of "{subject.name}"'
+        )
     return await message.answer("Subject or student not found")
 
 
@@ -53,7 +57,9 @@ async def quit_student_to_subject(
         student := await db.get_student(message.from_user.id)
     ):
         await subject.students.remove(student)
-        return await message.answer(f'You are now not a student of "{subject.name}"')
+        return await message.answer(
+            f'You are now not a student of "{subject.name}"'
+        )
     return await message.answer("Subject or student not found")
 
 
@@ -72,7 +78,9 @@ async def see_tasks(
                 f"{hbold('Name')}: {task.name}\n"
                 f"{hbold('Description')}: {task.description}\n"
                 f"{hbold('Due date')}: {task.due_date}",
-                reply_markup=task_keyboard(subject.id, task.id),
+                reply_markup=await task_keyboard(
+                    subject.id, task.id, message.from_user.id, db
+                ),
             )
         return await message.answer("Here are your tasks")
     return await message.answer("There are no tasks in this subject")
