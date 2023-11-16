@@ -77,6 +77,13 @@ class Database:
             subject=subject,
         )
 
+    async def get_solutions_for_task(
+        self, subject_task_id: int
+    ) -> list[Solution]:
+        return await self.solution.filter(
+            subject_task_id=subject_task_id
+        ).all()
+
     async def is_teacher(self, user_id: int) -> bool:
         return self.teacher.filter(user_id=user_id).exists()
 

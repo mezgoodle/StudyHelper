@@ -3,11 +3,12 @@ from datetime import datetime
 from aiogram import F, Router
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message
+from aiogram.types import CallbackQuery, Message
 from aiogram.utils.markdown import hbold
 
 from loader import dp
 from tgbot.filters.teacher import IsTeacherFilter
+from tgbot.keyboards.inline.callbacks import TaskCallbackFactory
 from tgbot.keyboards.reply.options_keyboard import options_keyboard
 from tgbot.misc.database import Database
 from tgbot.misc.utils import create_subject_message
@@ -135,3 +136,26 @@ async def get_subjects(
         await message.answer(text)
         return await message.answer("Click on the subject actions")
     return await message.answer("You don't have any subjects!")
+
+
+@router.callback_query(
+    TaskCallbackFactory.filter(F.action == "show_solutions")
+)
+async def show_solutions_for_task(
+    callback: CallbackQuery,
+    callback_data: TaskCallbackFactory,
+    state: FSMContext,
+    db: Database,
+) -> Message:
+    print(await db.get_solutions_for_task(callback_data.task_id))
+    await callback.message.answer("Hello")
+    return await callback.answer()
+    # await state.set_state(Solution.file_link)
+    # await state.update_data(
+    #     {
+    #         "subject_id": callback_data.subject_id,
+    #         "student_id": callback.from_user.id,
+    #     }
+    # )
+    # await callback.message.answer("Send a file(pdf or docx)")
+    # return )
