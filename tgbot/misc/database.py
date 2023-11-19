@@ -1,4 +1,10 @@
-from tgbot.models.models import Solution, Student, Subject, SubjectTask, Teacher
+from tgbot.models.models import (
+    Solution,
+    Student,
+    Subject,
+    SubjectTask,
+    Teacher,
+)
 
 
 class Database:
@@ -71,6 +77,18 @@ class Database:
             subject=subject,
         )
 
+    async def get_solutions_for_task(
+        self, subject_task_id: int
+    ) -> list[Solution]:
+        return (
+            await self.solution.filter(subject_task_id=subject_task_id)
+            .all()
+            .prefetch_related("student")
+        )
+
+    async def is_teacher(self, user_id: int) -> bool:
+        return self.teacher.filter(user_id=user_id).exists()
+
     def get_teachers(self) -> list[Teacher]:
         return self.teacher.all()
 
@@ -86,7 +104,9 @@ class Database:
     def get_student(self, user_id: int) -> Student | None:
         return self.student.filter(user_id=user_id).first()
 
-    async def get_subjects_by_teacher_id(self, teacher_id: int) -> list[Subject]:
+    async def get_subjects_by_teacher_id(
+        self, teacher_id: int
+    ) -> list[Subject]:
         return await self.subject.filter(teacher_id=teacher_id).all()
 
     async def get_student_subjects(self, student: Student) -> list[Subject]:

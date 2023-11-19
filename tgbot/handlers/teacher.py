@@ -3,15 +3,16 @@ from datetime import datetime
 from aiogram import F, Router
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message
+from aiogram.types import CallbackQuery, Message
 from aiogram.utils.markdown import hbold
 
 from loader import dp
 from tgbot.filters.teacher import IsTeacherFilter
+from tgbot.keyboards.inline.callbacks import TaskCallbackFactory
 from tgbot.keyboards.reply.options_keyboard import options_keyboard
 from tgbot.misc.database import Database
 from tgbot.misc.utils import create_subject_message
-from tgbot.models.models import Teacher
+from tgbot.models.models import Solution, Teacher
 from tgbot.states.states import Options, Subject, Task
 
 router = Router()
@@ -128,9 +129,37 @@ async def get_subjects(
             [
                 {"text": "Invite students", "name": "add_subject"},
                 {"text": "Add task", "name": "add_task"},
+                {"text": "See tasks", "name": "see_tasks"},
             ],
         )
         await message.answer("Here are your subjects:")
         await message.answer(text)
         return await message.answer("Click on the subject actions")
     return await message.answer("You don't have any subjects!")
+
+
+@router.callback_query(
+    TaskCallbackFactory.filter(F.action == "show_solutions")
+)
+async def show_solutions_for_task(
+    callback: CallbackQuery,
+    callback_data: TaskCallbackFactory,
+    state: FSMContext,
+    db: Database,
+) -> Message:
+    solutions: list[Solution] = await db.get_solutions_for_task(
+        callback_data.task_id
+    )
+    if not solutions:
+        await callback.message.answer("No solutions")
+    else:
+        for solution in solutions:
+            text = "\n".join(
+                [
+                    f"{hbold('Student')}: {solution.student.name}",
+                    f"{hbold('Grade')}: {solution.grade}",
+                    f"{hbold('File link')}: {solution.file_link}",
+                ]
+            )
+            await callback.message.answer(text)
+    return await callback.answer()

@@ -22,7 +22,10 @@ async def create_solution(
 ) -> Message:
     await state.set_state(Solution.file_link)
     await state.update_data(
-        {"subject_id": callback_data.subject_id, "student_id": callback.from_user.id}
+        {
+            "subject_id": callback_data.subject_id,
+            "student_id": callback.from_user.id,
+        }
     )
     await callback.message.answer("Send a file(pdf or docx)")
     return await callback.answer()
