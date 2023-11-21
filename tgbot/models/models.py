@@ -77,7 +77,9 @@ class SubjectTask(Task):
 
 
 class Solution(TimedBaseModel):
-    subject_task: fields.ForeignKeyRelation[SubjectTask] = fields.ForeignKeyField(
+    subject_task: fields.ForeignKeyRelation[
+        SubjectTask
+    ] = fields.ForeignKeyField(
         "models.SubjectTask",
         related_name="students",
         description="Task subject",
@@ -86,7 +88,9 @@ class Solution(TimedBaseModel):
     grade = fields.IntField(
         null=True,
         description="Task grade",
-        default=0,
+        default=1,
+        min_value=1,
+        max_value=5,
     )
     student: fields.ForeignKeyRelation[Student] = fields.ForeignKeyField(
         "models.Student",
