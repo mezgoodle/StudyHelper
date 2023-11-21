@@ -4,13 +4,15 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from tgbot.keyboards.inline.callbacks import SolutionCallbackFactory
 
 
-def solution_keyboard(solution_id: int) -> InlineKeyboardMarkup:
+def solution_keyboard(
+    solution_id: int, current_grade: int
+) -> InlineKeyboardMarkup:
     keyboard = InlineKeyboardBuilder()
     buttons_list = []
     for grade in range(1, 6):
         buttons_list.append(
             InlineKeyboardButton(
-                text=str(grade),
+                text=f"✅{grade}" if grade == current_grade else str(grade),
                 callback_data=SolutionCallbackFactory(
                     solution_id=solution_id,
                     grade=grade,

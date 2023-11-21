@@ -89,7 +89,18 @@ class Database:
     async def update_solution_grade(
         self, solution_id: int, grade: int
     ) -> Solution | None:
-        return await self.solution.filter(id=solution_id).update(grade=grade)
+        rows_affected = await self.solution.filter(id=solution_id).update(
+            grade=grade
+        )
+
+        if rows_affected > 0:
+            updated_solution = (
+                await self.solution.filter(id=solution_id)
+                .first()
+                .prefetch_related("student")
+            )
+            return updated_solution
+        return None
 
     async def is_student(self, user_id: int) -> bool:
         return self.student.filter(user_id=user_id).exists()

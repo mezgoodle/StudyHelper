@@ -165,7 +165,8 @@ async def show_solutions_for_task(
                 ]
             )
             await callback.message.answer(
-                text, reply_markup=solution_keyboard(solution.id)
+                text,
+                reply_markup=solution_keyboard(solution.id, solution.grade),
             )
     return await callback.answer()
 
@@ -188,7 +189,10 @@ async def review_solution(
             ]
         )
         await callback.message.edit_text(
-            text, reply_markup=solution_keyboard(new_solution.id)
+            text,
+            reply_markup=solution_keyboard(
+                new_solution.id, new_solution.grade
+            ),
         )
         return await callback.answer("Solution was reviewed")
     return await callback.answer("Error was occurred")
