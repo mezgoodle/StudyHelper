@@ -4,7 +4,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from tgbot.keyboards.inline.callbacks import SolutionCallbackFactory
 
 
-async def solution_keyboard(solution_id: int) -> InlineKeyboardMarkup:
+def solution_keyboard(solution_id: int) -> InlineKeyboardMarkup:
     keyboard = InlineKeyboardBuilder()
     buttons_list = []
     for grade in range(1, 6):
@@ -14,7 +14,7 @@ async def solution_keyboard(solution_id: int) -> InlineKeyboardMarkup:
                 callback_data=SolutionCallbackFactory(
                     solution_id=solution_id,
                     grade=grade,
-                ),
+                ).pack(),
             )
         )
     keyboard.row(*buttons_list)

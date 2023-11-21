@@ -86,6 +86,14 @@ class Database:
             .prefetch_related("student")
         )
 
+    async def update_solution_grade(
+        self, solution_id: int, grade: int
+    ) -> Solution | None:
+        return await self.solution.filter(id=solution_id).update(grade=grade)
+
+    async def is_student(self, user_id: int) -> bool:
+        return self.student.filter(user_id=user_id).exists()
+
     async def is_teacher(self, user_id: int) -> bool:
         return self.teacher.filter(user_id=user_id).exists()
 
