@@ -21,6 +21,7 @@ from tgbot.states.states import Options, Subject, Task
 
 router = Router()
 router.message.filter(IsTeacherFilter())
+router.callback_query.filter(IsTeacherFilter())
 dp.include_router(router)
 
 
