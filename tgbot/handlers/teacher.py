@@ -8,7 +8,11 @@ from aiogram.utils.markdown import hbold
 
 from loader import dp
 from tgbot.filters.teacher import IsTeacherFilter
-from tgbot.keyboards.inline.callbacks import TaskCallbackFactory
+from tgbot.keyboards.inline.callbacks import (
+    SolutionCallbackFactory,
+    TaskCallbackFactory,
+)
+from tgbot.keyboards.inline.solution_keyboard import solution_keyboard
 from tgbot.keyboards.reply.options_keyboard import options_keyboard
 from tgbot.misc.database import Database
 from tgbot.misc.utils import create_subject_message
@@ -144,7 +148,6 @@ async def get_subjects(
 async def show_solutions_for_task(
     callback: CallbackQuery,
     callback_data: TaskCallbackFactory,
-    state: FSMContext,
     db: Database,
 ) -> Message:
     solutions: list[Solution] = await db.get_solutions_for_task(
@@ -161,5 +164,35 @@ async def show_solutions_for_task(
                     f"{hbold('File link')}: {solution.file_link}",
                 ]
             )
-            await callback.message.answer(text)
+            await callback.message.answer(
+                text,
+                reply_markup=solution_keyboard(solution.id, solution.grade),
+            )
     return await callback.answer()
+
+
+@router.callback_query(SolutionCallbackFactory.filter())
+async def review_solution(
+    callback: CallbackQuery,
+    callback_data: SolutionCallbackFactory,
+    db: Database,
+) -> Message:
+    if new_solution := await db.update_solution_grade(
+        callback_data.solution_id,
+        callback_data.grade,
+    ):
+        text = "\n".join(
+            [
+                f"{hbold('Student')}: {new_solution.student.name}",
+                f"{hbold('Grade')}: {new_solution.grade}",
+                f"{hbold('File link')}: {new_solution.file_link}",
+            ]
+        )
+        await callback.message.edit_text(
+            text,
+            reply_markup=solution_keyboard(
+                new_solution.id, new_solution.grade
+            ),
+        )
+        return await callback.answer("Solution was reviewed")
+    return await callback.answer("Error was occurred")
