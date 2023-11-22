@@ -86,6 +86,18 @@ class Database:
             .prefetch_related("student")
         )
 
+    async def get_student_solution(
+        self, student_id: int, subject_task_id: int
+    ) -> Solution | None:
+        student = await self.get_student(student_id)
+        return (
+            await self.solution.filter(
+                student=student.id, subject_task_id=subject_task_id
+            )
+            .first()
+            .prefetch_related("student")
+        )
+
     async def update_solution_grade(
         self, solution_id: int, grade: int
     ) -> Solution | None:
@@ -106,7 +118,7 @@ class Database:
         return self.student.filter(user_id=user_id).exists()
 
     async def is_teacher(self, user_id: int) -> bool:
-        return self.teacher.filter(user_id=user_id).exists()
+        return await self.teacher.filter(user_id=user_id).exists()
 
     def get_teachers(self) -> list[Teacher]:
         return self.teacher.all()
