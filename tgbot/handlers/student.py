@@ -14,6 +14,7 @@ from tgbot.models.models import Student
 
 router = Router()
 router.message.filter(IsStudentFilter())
+router.callback_query.filter(IsStudentFilter())
 dp.include_router(router)
 
 
@@ -61,5 +62,5 @@ async def see_my_solution(
             reply_markup=solution_keyboard(solution.id, solution.grade),
         )
     else:
-        await callback.message.answer("No solutions")
+        await callback.message.answer("There is no solution.")
     return await callback.answer()

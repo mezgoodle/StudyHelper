@@ -155,7 +155,7 @@ async def show_solutions_for_task(
         callback_data.task_id
     )
     if not solutions:
-        await callback.message.answer("No solutions")
+        await callback.message.answer("There are no solutions.")
     else:
         for solution in solutions:
             text = "\n".join(
