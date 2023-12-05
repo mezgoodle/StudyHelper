@@ -44,7 +44,6 @@ async def get_subjects(
 async def see_my_solution(
     callback: CallbackQuery,
     callback_data: TaskCallbackFactory,
-    state: FSMContext,
     db: Database,
 ) -> Message:
     if solution := await db.get_student_solution(
