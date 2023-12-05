@@ -1,6 +1,5 @@
 from aiogram import F, Router
 from aiogram.filters import Command
-from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 from aiogram.utils.markdown import hbold
 
@@ -44,7 +43,6 @@ async def get_subjects(
 async def see_my_solution(
     callback: CallbackQuery,
     callback_data: TaskCallbackFactory,
-    state: FSMContext,
     db: Database,
 ) -> Message:
     if solution := await db.get_student_solution(
