@@ -46,5 +46,9 @@ async def set_solution_file_link(
     await state.update_data(file_link=message.text)
     data = await state.get_data()
     await state.clear()
+    if previous_solution := await db.get_student_solution(
+        data.get("student_id"), data.get("subject_id")
+    ):
+        await previous_solution.delete()
     await db.create_solution(**data)
     return await message.answer("Write a task id")
