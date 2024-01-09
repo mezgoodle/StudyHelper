@@ -115,7 +115,7 @@ class Database:
         return None
 
     async def is_student(self, user_id: int) -> bool:
-        return self.student.filter(user_id=user_id).exists()
+        return await self.student.filter(user_id=user_id).exists()
 
     async def is_teacher(self, user_id: int) -> bool:
         return await self.teacher.filter(user_id=user_id).exists()

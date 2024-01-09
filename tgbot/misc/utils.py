@@ -73,6 +73,7 @@ async def see_tasks(
     if (subject := await db.get_subject(payload.get("id"))) and (
         tasks := await subject.tasks
     ):
+        await message.answer("Here are your tasks")
         for task in tasks:
             await message.answer(
                 f"{hbold('Name')}: {task.name}\n"
@@ -82,7 +83,7 @@ async def see_tasks(
                     subject.id, task.id, message.from_user.id, db
                 ),
             )
-        return await message.answer("Here are your tasks")
+        return await message.answer("Your buttons are depends on your role")
     return await message.answer("There are no tasks in this subject")
 
 
