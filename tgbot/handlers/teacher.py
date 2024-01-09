@@ -15,6 +15,7 @@ from tgbot.keyboards.inline.callbacks import (
 from tgbot.keyboards.inline.solution_keyboard import solution_keyboard
 from tgbot.keyboards.reply.options_keyboard import options_keyboard
 from tgbot.misc.database import Database
+from tgbot.misc.texts import TEACHER_HELP_TEXT
 from tgbot.misc.utils import create_subject_message
 from tgbot.models.models import Solution, Teacher
 from tgbot.states.states import Options, Subject, Task
@@ -26,8 +27,9 @@ dp.include_router(router)
 
 
 @router.message(Command("is_teacher"))
-async def check_teacher(message: Message) -> None:
-    return await message.answer("You are a teacher!")
+async def check_teacher(message: Message) -> Message:
+    await message.answer("You are a teacher!")
+    return await message.answer(TEACHER_HELP_TEXT, parse_mode="HTML")
 
 
 @router.message(Command("create_subject"))
