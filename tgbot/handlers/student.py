@@ -8,6 +8,7 @@ from tgbot.filters.student import IsStudentFilter
 from tgbot.keyboards.inline.callbacks import TaskCallbackFactory
 from tgbot.keyboards.inline.solution_keyboard import solution_keyboard
 from tgbot.misc.database import Database
+from tgbot.misc.texts import STUDENT_HELP_TEXT
 from tgbot.misc.utils import create_subject_message
 from tgbot.models.models import Student
 
@@ -18,8 +19,9 @@ dp.include_router(router)
 
 
 @router.message(Command("is_student"))
-async def check_student(message: Message) -> None:
-    return await message.answer("You are a student!")
+async def check_student(message: Message) -> Message:
+    await message.answer("You are a student!")
+    return await message.answer(STUDENT_HELP_TEXT)
 
 
 @router.message(Command("my_subjects"))

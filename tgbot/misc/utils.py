@@ -83,7 +83,7 @@ async def see_tasks(
                     subject.id, task.id, message.from_user.id, db
                 ),
             )
-        return await message.answer("Your buttons are depends on your role")
+        return await message.answer("Your buttons depend on your role")
     return await message.answer("There are no tasks in this subject")
 
 
