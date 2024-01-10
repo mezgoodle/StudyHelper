@@ -22,6 +22,7 @@ async def task_keyboard(
     if await db.is_teacher(user_id):
         buttons_list = [
             {"text": "See solutions", "action_text": "show_solutions"},
+            {"text": "Edit the task", "action_text": "edit"},
         ]
     keyboard = InlineKeyboardBuilder()
     keyboard.row(

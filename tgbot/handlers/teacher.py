@@ -174,6 +174,18 @@ async def show_solutions_for_task(
     return await callback.answer()
 
 
+@router.callback_query(TaskCallbackFactory.filter(F.action == "edit"))
+async def edit_task(
+    callback: CallbackQuery,
+    callback_data: TaskCallbackFactory,
+    state: FSMContext,
+) -> Message:
+    await state.set_state(Task.name)
+    await state.update_data(subject_id=callback_data.subject_id)
+    await callback.message.answer("Write a name for task name")
+    return await callback.answer()
+
+
 @router.callback_query(SolutionCallbackFactory.filter())
 async def review_solution(
     callback: CallbackQuery,
