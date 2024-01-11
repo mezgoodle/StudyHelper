@@ -29,7 +29,7 @@ dp.include_router(router)
 @router.message(Command("is_teacher"))
 async def check_teacher(message: Message) -> Message:
     await message.answer("You are a teacher!")
-    return await message.answer(TEACHER_HELP_TEXT, parse_mode="HTML")
+    return await message.answer(TEACHER_HELP_TEXT)
 
 
 @router.message(Command("create_subject"))
