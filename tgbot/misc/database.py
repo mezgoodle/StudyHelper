@@ -70,12 +70,15 @@ class Database:
         subject_id: int,
     ) -> SubjectTask | None:
         subject = await self.get_subject(subject_id)
-        return await self.subjecttask.create(
-            name=name,
-            description=description,
-            due_date=due_date,
+        new_task, _ = await self.subjecttask.update_or_create(
+            defaults={
+                "name": name,
+                "description": description,
+                "due_date": due_date,
+            },
             subject=subject,
         )
+        return new_task
 
     async def get_solutions_for_task(
         self, subject_task_id: int
@@ -115,7 +118,7 @@ class Database:
         return None
 
     async def is_student(self, user_id: int) -> bool:
-        return self.student.filter(user_id=user_id).exists()
+        return await self.student.filter(user_id=user_id).exists()
 
     async def is_teacher(self, user_id: int) -> bool:
         return await self.teacher.filter(user_id=user_id).exists()

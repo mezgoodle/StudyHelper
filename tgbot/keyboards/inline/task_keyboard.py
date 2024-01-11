@@ -15,11 +15,14 @@ async def task_keyboard(
     subject_id: int, task_id: int, user_id: int, db: Database
 ) -> InlineKeyboardMarkup:
     buttons_list = TASK_BUTTONS
-    if solution := await db.get_student_solution(user_id, task_id):
+    if await db.is_student(user_id) and (
+        solution := await db.get_student_solution(user_id, task_id)
+    ):
         buttons_list[2]["text"] = f"Your grade: {solution.grade}"
     if await db.is_teacher(user_id):
         buttons_list = [
             {"text": "See solutions", "action_text": "show_solutions"},
+            {"text": "Edit the task", "action_text": "edit"},
         ]
     keyboard = InlineKeyboardBuilder()
     keyboard.row(

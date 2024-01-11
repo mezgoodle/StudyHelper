@@ -15,6 +15,7 @@ from tgbot.keyboards.inline.callbacks import (
 from tgbot.keyboards.inline.solution_keyboard import solution_keyboard
 from tgbot.keyboards.reply.options_keyboard import options_keyboard
 from tgbot.misc.database import Database
+from tgbot.misc.texts import TEACHER_HELP_TEXT
 from tgbot.misc.utils import create_subject_message
 from tgbot.models.models import Solution, Teacher
 from tgbot.states.states import Options, Subject, Task
@@ -26,8 +27,9 @@ dp.include_router(router)
 
 
 @router.message(Command("is_teacher"))
-async def check_teacher(message: Message) -> None:
-    return await message.answer("You are a teacher!")
+async def check_teacher(message: Message) -> Message:
+    await message.answer("You are a teacher!")
+    return await message.answer(TEACHER_HELP_TEXT)
 
 
 @router.message(Command("create_subject"))
@@ -169,6 +171,18 @@ async def show_solutions_for_task(
                 text,
                 reply_markup=solution_keyboard(solution.id, solution.grade),
             )
+    return await callback.answer()
+
+
+@router.callback_query(TaskCallbackFactory.filter(F.action == "edit"))
+async def edit_task(
+    callback: CallbackQuery,
+    callback_data: TaskCallbackFactory,
+    state: FSMContext,
+) -> Message:
+    await state.set_state(Task.name)
+    await state.update_data(subject_id=callback_data.subject_id)
+    await callback.message.answer("Write a name for task name")
     return await callback.answer()
 
 
