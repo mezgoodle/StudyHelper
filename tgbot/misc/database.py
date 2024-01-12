@@ -123,20 +123,20 @@ class Database:
     async def is_teacher(self, user_id: int) -> bool:
         return await self.teacher.filter(user_id=user_id).exists()
 
-    def get_teachers(self) -> list[Teacher]:
-        return self.teacher.all()
+    async def get_teachers(self) -> list[Teacher]:
+        return await self.teacher.all()
 
-    def get_students(self) -> list[Student]:
-        return self.student.all()
+    async def get_students(self) -> list[Student]:
+        return await self.student.all()
 
-    def get_teacher(self, user_id: int) -> Teacher | None:
-        return self.teacher.filter(user_id=user_id).first()
+    async def get_teacher(self, user_id: int) -> Teacher | None:
+        return await self.teacher.filter(user_id=user_id).first()
 
-    def get_subject(self, subject_id: int) -> Subject | None:
-        return self.subject.filter(id=subject_id).first()
+    async def get_subject(self, subject_id: int) -> Subject | None:
+        return await self.subject.filter(id=subject_id).first()
 
-    def get_student(self, user_id: int) -> Student | None:
-        return self.student.filter(user_id=user_id).first()
+    async def get_student(self, user_id: int) -> Student | None:
+        return await self.student.filter(user_id=user_id).first()
 
     async def get_subjects_by_teacher_id(
         self, teacher_id: int
