@@ -112,7 +112,7 @@ class Database:
             updated_solution = (
                 await self.solution.filter(id=solution_id)
                 .first()
-                .prefetch_related("student")
+                .prefetch_related("student", "subject_task")
             )
             return updated_solution
         return None

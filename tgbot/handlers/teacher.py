@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from aiogram import F, Router
+from aiogram import Bot, F, Router
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
@@ -191,6 +191,7 @@ async def review_solution(
     callback: CallbackQuery,
     callback_data: SolutionCallbackFactory,
     db: Database,
+    bot: Bot,
 ) -> Message:
     if new_solution := await db.update_solution_grade(
         callback_data.solution_id,
@@ -208,6 +209,10 @@ async def review_solution(
             reply_markup=solution_keyboard(
                 new_solution.id, new_solution.grade
             ),
+        )
+        await bot.send_message(
+            new_solution.student.user_id,
+            f'Your solution for task "{hbold(new_solution.subject_task.name)}" was reviewed. New grade: {hbold(new_solution.grade)}',
         )
         return await callback.answer("Solution was reviewed")
     return await callback.answer("Error was occurred")
