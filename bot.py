@@ -2,14 +2,16 @@ import asyncio
 import logging
 
 from aiogram import Bot, Dispatcher
-# from aiogram.utils.callback_answer import CallbackAnswerMiddleware
 
+# from aiogram.utils.callback_answer import CallbackAnswerMiddleware
 from loader import bot, dp
 from tgbot.config import Settings, config
 from tgbot.middlewares.database import DatabaseMiddleware
 from tgbot.middlewares.settings import ConfigMiddleware
+from tgbot.middlewares.storage import StorageMiddleware
 from tgbot.middlewares.throttling import ThrottlingMiddleware
 from tgbot.misc.database import Database
+from tgbot.misc.storage import Storage
 from tgbot.models.models import close_db, init
 from tgbot.services.admins_notify import on_startup_notify
 from tgbot.services.setting_commands import set_default_commands
@@ -31,6 +33,12 @@ def register_global_middlewares(dp: Dispatcher, config: Settings):
         ConfigMiddleware(config),
         ThrottlingMiddleware(),
         DatabaseMiddleware(Database()),
+        StorageMiddleware(
+            Storage(
+                config.access_id.get_secret_value(),
+                config.access_key.get_secret_value(),
+            )
+        ),
     ]
 
     for middleware in middlewares:
