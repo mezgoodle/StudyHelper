@@ -25,8 +25,8 @@ class Storage:
         for obj in self.bucket.objects.all():
             print(obj)
 
-    def add_file(self, file_name):
-        print(self.bucket.upload_file(file_name, file_name))
+    def add_file(self, file_name: str, name: str):
+        self.bucket.upload_file(file_name, name)
 
     def download_file(self, file_name):
         self.bucket.download_file(file_name, file_name)
