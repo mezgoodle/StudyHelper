@@ -53,10 +53,9 @@ class Database:
         )
 
     async def create_solution(
-        self, subject_id: int, student_id: int, file_link: str
+        self, subject_task_id: int, student_id: int, file_link: str
     ) -> Solution | None:
-        subject = await self.get_subject(subject_id)
-        subject_task = await self.subjecttask.filter(subject=subject).first()
+        subject_task = await self.get_subject_task(subject_task_id)
         student = await self.get_student(student_id)
         return await self.solution.create(
             subject_task=subject_task, student=student, file_link=file_link
@@ -93,9 +92,10 @@ class Database:
         self, student_id: int, subject_task_id: int
     ) -> Solution | None:
         student = await self.get_student(student_id)
+        subject_task = await self.get_subject_task(subject_task_id)
         return (
             await self.solution.filter(
-                student=student.id, subject_task_id=subject_task_id
+                student=student.id, subject_task=subject_task.id
             )
             .first()
             .prefetch_related("student")
@@ -134,6 +134,11 @@ class Database:
 
     async def get_subject(self, subject_id: int) -> Subject | None:
         return await self.subject.filter(id=subject_id).first()
+
+    async def get_subject_task(
+        self, subject_task_id: int
+    ) -> SubjectTask | None:
+        return await self.subjecttask.filter(id=subject_task_id).first()
 
     async def get_student(self, user_id: int) -> Student | None:
         return await self.student.filter(user_id=user_id).first()
