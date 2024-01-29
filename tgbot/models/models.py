@@ -45,11 +45,6 @@ class Subject(TimedBaseModel):
         related_name="subjects",
         description="Subject students",
     )
-    drive_link = fields.CharField(
-        max_length=255,
-        null=True,
-        description="Drive link",
-    )
     tasks: fields.ReverseRelation["SubjectTask"]
 
     def __str__(self):
