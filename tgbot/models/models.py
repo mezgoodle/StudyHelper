@@ -34,7 +34,9 @@ class Student(User):
 
 class Subject(TimedBaseModel):
     name = fields.CharField(max_length=255, description="Subject name")
-    description = fields.TextField(null=True)
+    description = fields.TextField(
+        null=True, max_length=200, description="Subject description"
+    )
     teacher: fields.ForeignKeyRelation[Teacher] = fields.ForeignKeyField(
         "models.Teacher",
         related_name="subjects",
@@ -53,7 +55,7 @@ class Subject(TimedBaseModel):
 
 class Task(TimedBaseModel):
     name = fields.CharField(max_length=255)
-    description = fields.TextField()
+    description = fields.TextField(max_length=200)
     due_date = fields.DatetimeField(
         null=True,
     )

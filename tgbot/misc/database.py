@@ -43,12 +43,11 @@ class Database:
         return await db_object.create(**kwargs)
 
     async def create_subject(
-        self, name: str, description: str, drive_link: str, teacher_id: int
+        self, name: str, description: str, teacher_id: int
     ) -> Subject | None:
         return await self.subject.create(
             name=name,
             description=description,
-            drive_link=drive_link,
             teacher_id=teacher_id,
         )
 
