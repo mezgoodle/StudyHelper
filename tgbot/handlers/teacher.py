@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from aiogram import Bot, F, Router
-from aiogram.filters import Command
+from aiogram.filters import Command, or_f
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 from aiogram.utils.markdown import hbold
@@ -42,10 +42,12 @@ async def create_subject(message: Message, state: FSMContext) -> None:
 async def set_subject_name(message: Message, state: FSMContext) -> None:
     await state.update_data(name=message.text)
     await state.set_state(Subject.description)
-    return await message.answer("Write a description for subject")
+    return await message.answer(
+        "Write a description for subject. Maximum 200 symbols."
+    )
 
 
-@router.message(Subject.description)
+@router.message(Subject.description, F.text.len() <= 200)
 async def set_subject_description(message: Message, state: FSMContext) -> None:
     await state.update_data(description=message.text)
     await state.set_state(Subject.drive_link)
@@ -93,15 +95,27 @@ async def decline_create(message: Message, state: FSMContext) -> None:
 async def set_task_name(message: Message, state: FSMContext) -> None:
     await state.update_data(name=message.text)
     await state.set_state(Task.description)
-    return await message.answer("Write a description for subject")
+    return await message.answer(
+        "Write a description for task. Maximum 200 symbols."
+    )
 
 
-@router.message(Task.description)
+@router.message(Task.description, F.text.len() <= 200)
 async def set_task_description(message: Message, state: FSMContext) -> None:
     await state.update_data(description=message.text)
     await state.set_state(Task.due_date)
     return await message.answer(
         "Please, write a due date in format dd/mm/yyyy"
+    )
+
+
+@router.message(
+    or_f(Task.description, Subject.description), F.text.len() > 200
+)
+async def set_description_fail(message: Message, state: FSMContext) -> None:
+    await state.clear()
+    return await message.answer(
+        "Limit reached. Object was not created. Try again."
     )
 
 
