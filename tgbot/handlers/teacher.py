@@ -48,17 +48,10 @@ async def set_subject_name(message: Message, state: FSMContext) -> None:
 
 
 @router.message(Subject.description, F.text.len() <= 200)
-async def set_subject_description(message: Message, state: FSMContext) -> None:
-    await state.update_data(description=message.text)
-    await state.set_state(Subject.drive_link)
-    return await message.answer("Write a google drive link")
-
-
-@router.message(Subject.drive_link)
-async def set_subject_drive_link(
+async def set_subject_description(
     message: Message, state: FSMContext, db: Database, teacher: Teacher
-) -> None:
-    await state.update_data(drive_link=message.text)
+) -> Message:
+    await state.update_data(description=message.text)
     subject_data = await state.get_data()
     await state.set_state(Options.option)
     await state.update_data(
@@ -67,8 +60,7 @@ async def set_subject_drive_link(
     await message.answer(
         f"Your subject:\n"
         f"{hbold('Name')}: {subject_data.get('name')}\n"
-        f"{hbold('Description')}: {subject_data.get('description')}\n"
-        f"{hbold('Drive link')}: {subject_data.get('drive_link')}"
+        f"{hbold('Description')}: {subject_data.get('description')}"
     )
     return await message.answer(
         "Do you want to create it?", reply_markup=options_keyboard()

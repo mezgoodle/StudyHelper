@@ -4,7 +4,6 @@ from aiogram.types import Message
 from aiogram.utils.markdown import hbold
 
 from loader import dp
-from tgbot.config import Settings
 
 router = Router()
 dp.include_router(router)
