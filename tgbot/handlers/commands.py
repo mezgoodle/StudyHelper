@@ -51,8 +51,22 @@ async def cmd_cancel(message: Message, state: FSMContext) -> Message:
     )
 
 
+@router.message(CommandStart())
+async def start_handler(message: Message) -> Message:
+    return await message.answer(
+        "Hello, I'm Study Helper bot! To see available commands, type /help"
+    )
+
+
+@router.message(Command("help"))
+async def help_handler(message: Message) -> Message:
+    return await message.answer(
+        "Available commands: /register_student, /register_teacher\nAdministator: @sylvenis"
+    )
+
+
 @router.message(CommandStart(deep_link=True))
-async def handler(
+async def deep_link_handler(
     message: Message, command: CommandObject, db: Database, state: FSMContext
 ) -> Message:
     args = command.args
