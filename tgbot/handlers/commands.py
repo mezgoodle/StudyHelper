@@ -3,7 +3,7 @@ from json import loads
 from aiogram import Router
 from aiogram.filters import Command, CommandObject, CommandStart
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message
+from aiogram.types import Message, ReplyKeyboardRemove
 from aiogram.utils.deep_linking import decode_payload
 
 from loader import dp
@@ -41,6 +41,14 @@ async def register_as_student(message: Message, db: Database) -> Message:
         )
         return await message.answer(STUDENT_HELP_TEXT)
     return await message.answer("Error while registering as a student")
+
+
+@router.message(Command(commands=["cancel"], ignore_case=True))
+async def cmd_cancel(message: Message, state: FSMContext) -> Message:
+    await state.clear()
+    return await message.answer(
+        text="Your state has been cleared", reply_markup=ReplyKeyboardRemove()
+    )
 
 
 @router.message(CommandStart(deep_link=True))

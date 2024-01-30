@@ -1,1 +1,1 @@
-from . import tasks, admin, student, teacher, commands, echo  # noqa
+from . import commands, tasks, admin, student, teacher, echo  # noqa
