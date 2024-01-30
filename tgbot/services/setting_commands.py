@@ -13,5 +13,11 @@ async def set_default_commands(bot: Bot) -> None:
         BotCommand(
             command="register_teacher", description="Register as teacher"
         ),
+        BotCommand(
+            command="is_teacher", description="Check if you are a teacher"
+        ),
+        BotCommand(
+            command="is_student", description="Check if you are a student"
+        ),
     ]
     await bot.set_my_commands(commands=commands)

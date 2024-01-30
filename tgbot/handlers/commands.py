@@ -44,7 +44,7 @@ async def register_as_student(message: Message, db: Database) -> Message:
 
 
 @router.message(Command(commands=["cancel"], ignore_case=True))
-async def cmd_cancel(message: Message, state: FSMContext) -> Message:
+async def cancel_handler(message: Message, state: FSMContext) -> Message:
     await state.clear()
     return await message.answer(
         text="Your state has been cleared", reply_markup=ReplyKeyboardRemove()
