@@ -51,6 +51,18 @@ async def cancel_handler(message: Message, state: FSMContext) -> Message:
     )
 
 
+@router.message(CommandStart(deep_link=True))
+async def deep_link_handler(
+    message: Message, command: CommandObject, db: Database, state: FSMContext
+) -> Message:
+    args = command.args
+    payload = decode_payload(args)
+    data: dict = loads(payload)
+    if (key := data.get("key")) and key in utils:
+        return await utils.get(key)(message, data, db, state)
+    return await message.answer("Unknown command")
+
+
 @router.message(CommandStart())
 async def start_handler(message: Message) -> Message:
     return await message.answer(
@@ -63,15 +75,3 @@ async def help_handler(message: Message) -> Message:
     return await message.answer(
         "Available commands: /register_student, /register_teacher\nAdministator: @sylvenis"
     )
-
-
-@router.message(CommandStart(deep_link=True))
-async def deep_link_handler(
-    message: Message, command: CommandObject, db: Database, state: FSMContext
-) -> Message:
-    args = command.args
-    payload = decode_payload(args)
-    data: dict = loads(payload)
-    if (key := data.get("key")) and key in utils:
-        return await utils.get(key)(message, data, db, state)
-    return await message.answer("Unknown command")
