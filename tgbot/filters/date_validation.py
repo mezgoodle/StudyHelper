@@ -13,8 +13,13 @@ class IsValidDataFilter(BaseFilter):
     async def __call__(
         self, event: Message | CallbackQuery, db: Database
     ) -> bool | dict[str, date]:
-        if (
-            validated_date := datetime.strptime(event.text, "%d/%m/%Y").date()
-        ) and validated_date >= date.today():
-            return {"validated_date": validated_date}
-        return False
+        try:
+            if (
+                validated_date := datetime.strptime(
+                    event.text, "%d/%m/%Y"
+                ).date()
+            ) and validated_date >= date.today():
+                return {"validated_date": validated_date}
+            return False
+        except ValueError:
+            return False
