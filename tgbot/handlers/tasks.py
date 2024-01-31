@@ -1,3 +1,5 @@
+from datetime import date
+
 from aiogram import Bot, F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
@@ -20,15 +22,23 @@ async def create_solution(
     callback: CallbackQuery,
     callback_data: TaskCallbackFactory,
     state: FSMContext,
+    db: Database,
 ) -> Message:
-    await state.set_state(Solution.file_link)
-    await state.update_data(
-        {
-            "subject_task_id": callback_data.task_id,
-            "student_id": callback.from_user.id,
-        }
-    )
-    await callback.message.answer("Send a file(pdf or docx)")
+    if subject_task := await db.get_subject_task(callback_data.task_id):
+        due_date = subject_task.due_date
+        if due_date.date() <= date.today():
+            await callback.message.answer(
+                "Due date has passed. You can't create solution."
+            )
+        else:
+            await state.set_state(Solution.file_link)
+            await state.update_data(
+                {
+                    "subject_task_id": callback_data.task_id,
+                    "student_id": callback.from_user.id,
+                }
+            )
+            await callback.message.answer("Send a file(pdf or docx)")
     return await callback.answer()
 
 

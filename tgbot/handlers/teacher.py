@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date
 
 from aiogram import Bot, F, Router
 from aiogram.filters import Command, or_f
@@ -7,6 +7,7 @@ from aiogram.types import CallbackQuery, Message
 from aiogram.utils.markdown import hbold
 
 from loader import dp
+from tgbot.filters.date_validation import IsValidDateFilter
 from tgbot.filters.teacher import IsTeacherFilter
 from tgbot.keyboards.inline.callbacks import (
     SolutionCallbackFactory,
@@ -111,13 +112,11 @@ async def set_description_fail(message: Message, state: FSMContext) -> None:
     )
 
 
-@router.message(Task.due_date)
+@router.message(Task.due_date, IsValidDateFilter())
 async def set_task_due_date(
-    message: Message, state: FSMContext, db: Database
-) -> None:
-    await state.update_data(
-        due_date=datetime.strptime(message.text, "%d/%m/%Y")
-    )
+    message: Message, state: FSMContext, db: Database, validated_date: date
+) -> Message:
+    await state.update_data(due_date=validated_date)
     task_data = await state.get_data()
     await state.set_state(Options.option)
     await state.update_data({"method": db.create_subject_task})
@@ -129,6 +128,13 @@ async def set_task_due_date(
     )
     return await message.answer(
         "Do you want to create it?", reply_markup=options_keyboard()
+    )
+
+
+@router.message(Task.due_date, ~IsValidDateFilter())
+async def set_task_due_date_fail(message: Message) -> Message:
+    return await message.answer(
+        "Your date is invalid. Look at the format, and it cannot be in the past. Try again."
     )
 
 

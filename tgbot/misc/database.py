@@ -1,3 +1,5 @@
+from datetime import date
+
 from tgbot.models.models import (
     Solution,
     Student,
@@ -64,7 +66,7 @@ class Database:
         self,
         name: str,
         description: str,
-        due_date: str,
+        due_date: date,
         subject_id: int,
     ) -> SubjectTask | None:
         subject = await self.get_subject(subject_id)
