@@ -3,15 +3,13 @@ from datetime import date, datetime
 from aiogram.filters import BaseFilter
 from aiogram.types import CallbackQuery, Message
 
-from tgbot.misc.database import Database
 
-
-class IsValidDataFilter(BaseFilter):
+class IsValidDateFilter(BaseFilter):
     def __init__(self):
         super().__init__()
 
     async def __call__(
-        self, event: Message | CallbackQuery, db: Database
+        self, event: Message | CallbackQuery
     ) -> bool | dict[str, date]:
         try:
             if (
