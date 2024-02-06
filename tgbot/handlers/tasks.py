@@ -59,7 +59,9 @@ async def set_solution_file_link(
     file_name = message.document.file_name
     file_link = f"{message.from_user.username}/{file_name}"
     await bot.download_file(file_path, file_name)
-    storage.add_file(file_name, file_link)
+    if not storage.add_file(file_name, file_link):
+        await message.answer("Error while uploading file")
+        return
     await state.update_data(file_link=file_link)
     data = await state.get_data()
     await state.clear()
