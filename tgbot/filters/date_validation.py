@@ -10,14 +10,14 @@ class IsValidDateFilter(BaseFilter):
 
     async def __call__(
         self, event: Message | CallbackQuery
-    ) -> bool | dict[str, date]:
+    ) -> bool | dict[str, str]:
         try:
             if (
                 validated_date := datetime.strptime(
                     event.text, "%d/%m/%Y"
                 ).date()
             ) and validated_date >= date.today():
-                return {"validated_date": validated_date}
+                return {"validated_date": validated_date.isoformat()}
             return False
         except ValueError:
             return False
