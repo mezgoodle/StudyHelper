@@ -1,5 +1,3 @@
-from datetime import date
-
 from aiogram import Bot, F, Router
 from aiogram.filters import Command, or_f
 from aiogram.fsm.context import FSMContext
