@@ -1,3 +1,5 @@
+import logging
+import os
 from json import dumps
 
 from aiogram.fsm.context import FSMContext
@@ -104,6 +106,18 @@ async def add_task(
         await state.update_data(subject_id=subject.id)
         return await message.answer("Write a name for task")
     return await message.answer("You are not a teacher of this subject")
+
+
+def delete_file(file_path: str):
+    try:
+        os.remove(file_path)
+        logging.info(f"File {file_path} has been deleted successfully")
+    except FileNotFoundError:
+        logging.error(f"The file {file_path} does not exist")
+    except PermissionError:
+        logging.error(f"Permission denied: unable to delete {file_path}")
+    except OSError as e:
+        logging.error(f"Error: {e}")
 
 
 utils = {

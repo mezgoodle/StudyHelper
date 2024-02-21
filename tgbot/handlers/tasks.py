@@ -9,6 +9,7 @@ from tgbot.filters.student import IsStudentFilter
 from tgbot.keyboards.inline.callbacks import TaskCallbackFactory
 from tgbot.misc.database import Database
 from tgbot.misc.storage import Storage
+from tgbot.misc.utils import delete_file
 from tgbot.states.states import Solution
 
 router = Router()
@@ -70,4 +71,5 @@ async def set_solution_file_link(
     ):
         await previous_solution.delete()
     await db.create_solution(**data)
+    delete_file(file_name)
     return await message.answer("Your solution was submitted!")
