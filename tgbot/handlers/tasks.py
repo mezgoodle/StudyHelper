@@ -69,7 +69,14 @@ async def set_solution_file_link(
     if previous_solution := await db.get_student_solution(
         data.get("student_id"), data.get("subject_task_id")
     ):
+        objects = storage.get_objects()
+        previous_file_link = previous_solution.file_link
+        if file_link != previous_file_link and previous_file_link in [
+            obj.key for obj in objects
+        ]:
+            storage.delete_file(previous_file_link)
         await previous_solution.delete()
+
     await db.create_solution(**data)
     delete_file(file_name)
     return await message.answer("Your solution was submitted!")

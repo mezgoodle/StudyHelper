@@ -111,7 +111,7 @@ async def add_task(
 def delete_file(file_path: str):
     try:
         os.remove(file_path)
-        logging.info(f"File {file_path} has been deleted successfully")
+        logging.info(f"File {file_path} has been deleted successfully locally")
     except FileNotFoundError:
         logging.error(f"The file {file_path} does not exist")
     except PermissionError:
