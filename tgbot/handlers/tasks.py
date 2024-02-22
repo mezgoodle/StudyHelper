@@ -66,6 +66,7 @@ async def set_solution_file_link(
     await state.update_data(file_link=file_link)
     data = await state.get_data()
     await state.clear()
+    delete_file(file_name)
     if previous_solution := await db.get_student_solution(
         data.get("student_id"), data.get("subject_task_id")
     ):
@@ -75,8 +76,8 @@ async def set_solution_file_link(
             obj.key for obj in objects
         ]:
             storage.delete_file(previous_file_link)
-        await previous_solution.delete()
-
+        if await db.update_solution_file_link(previous_solution, file_link):
+            return await message.answer("Your solution was updated!")
+        return await message.answer("Error while updating solution")
     await db.create_solution(**data)
-    delete_file(file_name)
     return await message.answer("Your solution was submitted!")
