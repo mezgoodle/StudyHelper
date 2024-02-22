@@ -118,6 +118,14 @@ class Database:
             return updated_solution
         return None
 
+    async def update_solution_file_link(
+        self, solution: Solution, new_file_link: str
+    ) -> bool:
+        rows_affected = await self.solution.filter(id=solution.id).update(
+            file_link=new_file_link
+        )
+        return rows_affected > 0
+
     async def is_student(self, user_id: int) -> bool:
         return await self.student.filter(user_id=user_id).exists()
 

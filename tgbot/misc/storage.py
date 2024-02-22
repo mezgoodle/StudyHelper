@@ -33,12 +33,12 @@ class Storage:
     def get_bucket(self):
         return self.bucket
 
-    def print_objects(self):
+    def get_objects(self) -> list:
         try:
-            for obj in self.bucket.objects.all():
-                print(obj.key)
+            return self.bucket.objects.all()
         except Exception as e:
             logging.error(f"Error while listing objects: {e}")
+            return []
 
     def add_file(self, file_name: str, name: str) -> bool:
         try:
@@ -59,3 +59,14 @@ class Storage:
         except Exception as e:
             logging.error(f"Error while downloading file: {e}")
             return False
+
+    def delete_file(self, file_name):
+        try:
+            self.bucket.delete_objects(
+                Delete={"Objects": [{"Key": file_name}]}
+            )
+            logging.info(
+                f"File '{file_name}' successfully deleted on the cloud"
+            )
+        except Exception as e:
+            logging.error(f"Error while deleting file: {e}")

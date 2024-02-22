@@ -9,6 +9,7 @@ from tgbot.filters.student import IsStudentFilter
 from tgbot.keyboards.inline.callbacks import TaskCallbackFactory
 from tgbot.misc.database import Database
 from tgbot.misc.storage import Storage
+from tgbot.misc.utils import delete_file
 from tgbot.states.states import Solution
 
 router = Router()
@@ -65,9 +66,18 @@ async def set_solution_file_link(
     await state.update_data(file_link=file_link)
     data = await state.get_data()
     await state.clear()
+    delete_file(file_name)
     if previous_solution := await db.get_student_solution(
         data.get("student_id"), data.get("subject_task_id")
     ):
-        await previous_solution.delete()
+        objects = storage.get_objects()
+        previous_file_link = previous_solution.file_link
+        if file_link != previous_file_link and previous_file_link in [
+            obj.key for obj in objects
+        ]:
+            storage.delete_file(previous_file_link)
+        if await db.update_solution_file_link(previous_solution, file_link):
+            return await message.answer("Your solution was updated!")
+        return await message.answer("Error while updating solution")
     await db.create_solution(**data)
     return await message.answer("Your solution was submitted!")

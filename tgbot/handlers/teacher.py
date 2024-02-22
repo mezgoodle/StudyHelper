@@ -1,5 +1,3 @@
-from datetime import date
-
 from aiogram import Bot, F, Router
 from aiogram.filters import Command, or_f
 from aiogram.fsm.context import FSMContext
@@ -114,7 +112,7 @@ async def set_description_fail(message: Message, state: FSMContext) -> None:
 
 @router.message(Task.due_date, IsValidDateFilter())
 async def set_task_due_date(
-    message: Message, state: FSMContext, db: Database, validated_date: date
+    message: Message, state: FSMContext, db: Database, validated_date: str
 ) -> Message:
     await state.update_data(due_date=validated_date)
     task_data = await state.get_data()
