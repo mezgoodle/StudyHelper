@@ -99,7 +99,7 @@ class Database:
                 student=student.id, subject_task=subject_task.id
             )
             .first()
-            .prefetch_related("student")
+            .prefetch_related("student", "subject_task__subject__teacher")
         )
 
     async def update_solution_grade(
@@ -147,7 +147,11 @@ class Database:
     async def get_subject_task(
         self, subject_task_id: int
     ) -> SubjectTask | None:
-        return await self.subjecttask.filter(id=subject_task_id).first()
+        return (
+            await self.subjecttask.filter(id=subject_task_id)
+            .first()
+            .prefetch_related("subject", "subject__teacher")
+        )
 
     async def get_student(self, user_id: int) -> Student | None:
         return await self.student.filter(user_id=user_id).first()
