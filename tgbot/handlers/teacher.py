@@ -176,7 +176,7 @@ async def show_solutions_for_task(
                 [
                     f"{hbold('Student')}: {solution.student.name}",
                     f"{hbold('Grade')}: {solution.grade}",
-                    f"{hbold('File link')}: {hlink("Click here", storage.create_presigned_url(solution.file_link))}",
+                    f"{hbold('File link')}: {hlink('Click here', storage.create_presigned_url(solution.file_link))}",
                 ]
             )
             await callback.message.answer(
