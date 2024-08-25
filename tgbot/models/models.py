@@ -74,13 +74,13 @@ class SubjectTask(Task):
 
 
 class Solution(TimedBaseModel):
-    subject_task: fields.ForeignKeyRelation[
-        SubjectTask
-    ] = fields.ForeignKeyField(
-        "models.SubjectTask",
-        related_name="students",
-        description="Task subject",
-        on_delete=fields.OnDelete.CASCADE,
+    subject_task: fields.ForeignKeyRelation[SubjectTask] = (
+        fields.ForeignKeyField(
+            "models.SubjectTask",
+            related_name="students",
+            description="Task subject",
+            on_delete=fields.OnDelete.CASCADE,
+        )
     )
     grade = fields.IntField(
         null=True,

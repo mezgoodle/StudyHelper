@@ -37,6 +37,8 @@ def register_global_middlewares(dp: Dispatcher, config: Settings):
             Storage(
                 config.access_id.get_secret_value(),
                 config.access_key.get_secret_value(),
+                config.bucket_name,
+                config.region_name,
             )
         ),
     ]

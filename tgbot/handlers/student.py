@@ -1,13 +1,14 @@
 from aiogram import F, Router
 from aiogram.filters import Command
 from aiogram.types import CallbackQuery, Message
-from aiogram.utils.markdown import hbold
+from aiogram.utils.markdown import hbold, hlink
 
 from loader import dp
 from tgbot.filters.student import IsStudentFilter
 from tgbot.keyboards.inline.callbacks import TaskCallbackFactory
 from tgbot.keyboards.inline.solution_keyboard import solution_keyboard
 from tgbot.misc.database import Database
+from tgbot.misc.storage import Storage
 from tgbot.misc.texts import STUDENT_HELP_TEXT
 from tgbot.misc.utils import create_subject_message
 from tgbot.models.models import Student
@@ -46,6 +47,7 @@ async def see_my_solution(
     callback: CallbackQuery,
     callback_data: TaskCallbackFactory,
     db: Database,
+    storage: Storage,
 ) -> Message:
     if solution := await db.get_student_solution(
         callback.from_user.id, callback_data.task_id
@@ -54,7 +56,7 @@ async def see_my_solution(
             [
                 f"{hbold('Student')}: {solution.student.name}",
                 f"{hbold('Grade')}: {solution.grade}",
-                f"{hbold('File link')}: {solution.file_link}",
+                f"{hbold('File link')}: {hlink('Click here', storage.create_presigned_url(solution.file_link))}",
             ]
         )
         await callback.message.answer(

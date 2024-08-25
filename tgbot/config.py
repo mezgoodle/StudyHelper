@@ -8,6 +8,8 @@ class Settings(BaseSettings):
     bot_token: SecretStr
     access_id: SecretStr
     access_key: SecretStr
+    bucket_name: str = "studyhelper"
+    region_name: str = "eu-central-1"
     admins: List[int] = [353057906]
 
     model_config = SettingsConfigDict(
