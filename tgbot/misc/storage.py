@@ -5,9 +5,21 @@ from botocore.exceptions import NoCredentialsError
 
 
 class Storage:
-    def __init__(self, access_id: str, access_key: str, bucket_name: str):
+    def __init__(
+        self,
+        access_id: str,
+        access_key: str,
+        bucket_name: str,
+        region_name: str,
+    ):
         self.bucket_name = bucket_name
         try:
+            self.client = boto3.client(
+                service_name="s3",
+                region_name=region_name,
+                aws_access_key_id=access_id,
+                aws_secret_access_key=access_key,
+            )
             self.s3 = boto3.resource(
                 service_name="s3",
                 region_name="eu-central-1",
@@ -74,7 +86,7 @@ class Storage:
 
     def create_presigned_url(self, file_name) -> str:
         try:
-            return self.bucket.generate_presigned_url(
+            return self.client.generate_presigned_url(
                 "get_object",
                 Params={"Bucket": self.bucket_name, "Key": file_name},
                 ExpiresIn=60,

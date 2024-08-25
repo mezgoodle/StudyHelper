@@ -2,7 +2,7 @@ from aiogram import Bot, F, Router
 from aiogram.filters import Command, or_f
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
-from aiogram.utils.markdown import hbold
+from aiogram.utils.markdown import hbold, hlink
 
 from loader import dp
 from tgbot.filters.date_validation import IsValidDateFilter
@@ -14,6 +14,7 @@ from tgbot.keyboards.inline.callbacks import (
 from tgbot.keyboards.inline.solution_keyboard import solution_keyboard
 from tgbot.keyboards.reply.options_keyboard import options_keyboard
 from tgbot.misc.database import Database
+from tgbot.misc.storage import Storage
 from tgbot.misc.texts import TEACHER_HELP_TEXT
 from tgbot.misc.utils import create_subject_message
 from tgbot.models.models import Solution, Teacher
@@ -162,6 +163,7 @@ async def show_solutions_for_task(
     callback: CallbackQuery,
     callback_data: TaskCallbackFactory,
     db: Database,
+    storage: Storage,
 ) -> Message:
     solutions: list[Solution] = await db.get_solutions_for_task(
         callback_data.task_id
@@ -174,7 +176,7 @@ async def show_solutions_for_task(
                 [
                     f"{hbold('Student')}: {solution.student.name}",
                     f"{hbold('Grade')}: {solution.grade}",
-                    f"{hbold('File link')}: {solution.file_link}",
+                    f"{hbold('File link')}: {hlink("Click here", storage.create_presigned_url(solution.file_link))}",
                 ]
             )
             await callback.message.answer(
