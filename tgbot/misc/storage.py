@@ -101,12 +101,3 @@ class Storage:
         except Exception as e:
             logging.error(f"Error while creating presigned URL: {e}")
             return ""
-
-
-s = Storage(
-    "AKIAT5TAZ4EIOSLX5FUW",
-    "/aNkNNEurG4PqESELIC9FxTcaONmZ0J2P+IFAt7H",
-    "studyhelper",
-    "eu-central-1",
-)
-s.print_buckets()
