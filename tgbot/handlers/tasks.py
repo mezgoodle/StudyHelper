@@ -3,7 +3,7 @@ from datetime import date
 from aiogram import Bot, F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
-from aiogram.utils.markdown import hbold
+from aiogram.utils.markdown import hbold, hlink
 
 from loader import dp
 from tgbot.filters.student import IsStudentFilter
@@ -82,13 +82,13 @@ async def set_solution_file_link(
             await message.answer("Your solution was updated!")
             return await bot.send_message(
                 teacher_id,
-                f"Updated solution from @{message.from_user.username} for subject task {hbold(previous_solution.subject_task.name)}",
+                f"Updated solution from @{message.from_user.username} for subject task {hbold(previous_solution.subject_task.name)}. Link {hlink('here', storage.create_presigned_url(file_link))}",
             )
         return await message.answer("Error while updating solution")
     solution = await db.create_solution(**data)
     teacher_id = solution.subject_task.subject.teacher.user_id
     await bot.send_message(
         teacher_id,
-        f"New solution from @{message.from_user.username} for subject task {hbold(solution.subject_task.name)}",
+        f"New solution from @{message.from_user.username} for subject task {hbold(solution.subject_task.name)}. Link {hlink('here', storage.create_presigned_url(solution.file_link))}",
     )
     return await message.answer("Your solution was submitted!")
