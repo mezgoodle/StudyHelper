@@ -27,8 +27,9 @@ class Storage:
 
     def print_buckets(self):
         try:
-            for bucket in self.s3.buckets.all():
-                print(bucket.name)
+            response = self.client.list_buckets()
+            for bucket in response["Buckets"]:
+                print(bucket["Name"])
         except Exception as e:
             logging.error(f"Error while listing buckets: {e}")
 
@@ -100,3 +101,12 @@ class Storage:
         except Exception as e:
             logging.error(f"Error while creating presigned URL: {e}")
             return ""
+
+
+s = Storage(
+    "AKIAT5TAZ4EIOSLX5FUW",
+    "/aNkNNEurG4PqESELIC9FxTcaONmZ0J2P+IFAt7H",
+    "studyhelper",
+    "eu-central-1",
+)
+s.print_buckets()
