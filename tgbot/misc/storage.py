@@ -27,9 +27,8 @@ class Storage:
 
     def print_buckets(self):
         try:
-            response = self.client.list_buckets()
-            for bucket in response["Buckets"]:
-                print(bucket["Name"])
+            for bucket in self.s3.buckets.all():
+                print(bucket.name)
         except Exception as e:
             logging.error(f"Error while listing buckets: {e}")
 
