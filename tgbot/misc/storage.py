@@ -50,12 +50,10 @@ class Storage:
             else:
                 logging.error(f"Error occurred: {e}")
 
-    def get_bucket(self):
-        return self.bucket
-
     def get_objects(self) -> list:
         try:
-            return self.bucket.objects.all()
+            response = self.client.list_objects_v2(Bucket=self.bucket_name)
+            return response["Contents"]
         except Exception as e:
             logging.error(f"Error while listing objects: {e}")
             return []
@@ -80,16 +78,16 @@ class Storage:
             logging.error(f"Error while downloading file: {e}")
             return False
 
-    def delete_file(self, file_name):
+    def delete_file(self, file_name) -> bool:
         try:
-            self.bucket.delete_objects(
-                Delete={"Objects": [{"Key": file_name}]}
-            )
+            self.client.delete_object(Bucket=self.bucket_name, Key=file_name)
             logging.info(
                 f"File '{file_name}' successfully deleted on the cloud"
             )
+            return True
         except Exception as e:
             logging.error(f"Error while deleting file: {e}")
+            return False
 
     def create_presigned_url(self, file_name) -> str:
         try:
