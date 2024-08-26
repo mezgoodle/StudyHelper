@@ -75,7 +75,7 @@ async def set_solution_file_link(
         objects = storage.get_objects()
         previous_file_link = previous_solution.file_link
         if file_link != previous_file_link and previous_file_link in [
-            obj.key for obj in objects
+            obj["Key"] for obj in objects
         ]:
             storage.delete_file(previous_file_link)
         if await db.update_solution_file_link(previous_solution, file_link):
