@@ -62,7 +62,7 @@ class Storage:
 
     def add_file(self, file_name: str, name: str) -> bool:
         try:
-            self.bucket.upload_file(file_name, name)
+            _ = self.client.upload_file(file_name, self.bucket_name, name)
             logging.info(
                 f"File '{file_name}' successfully uploaded as '{name}'"
             )
