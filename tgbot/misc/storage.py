@@ -73,7 +73,7 @@ class Storage:
 
     def download_file(self, file_name) -> bool:
         try:
-            self.bucket.download_file(file_name, file_name)
+            self.client.download_file(self.bucket_name, file_name, file_name)
             logging.info(f"File '{file_name}' successfully downloaded")
             return True
         except Exception as e:
