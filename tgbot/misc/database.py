@@ -68,6 +68,7 @@ class Database:
         description: str,
         due_date: date,
         subject_id: int,
+        task_id: int | None = None,
     ) -> SubjectTask | None:
         subject = await self.get_subject(subject_id)
         new_task, _ = await self.subjecttask.update_or_create(
@@ -77,6 +78,7 @@ class Database:
                 "due_date": due_date,
             },
             subject=subject,
+            pk=task_id,
         )
         return new_task
 
