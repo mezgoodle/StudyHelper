@@ -193,6 +193,7 @@ async def edit_task(
     state: FSMContext,
 ) -> Message:
     await state.set_state(Task.name)
+    await state.update_data(task_id=callback_data.task_id)
     await state.update_data(subject_id=callback_data.subject_id)
     await callback.message.answer("Write a name for task name")
     return await callback.answer()
