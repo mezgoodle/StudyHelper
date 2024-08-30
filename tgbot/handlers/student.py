@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from aiogram import F, Router
 from aiogram.filters import Command
 from aiogram.types import CallbackQuery, Message
@@ -52,7 +54,12 @@ async def show_upcoming_tasks(
         tasks = await subject.tasks.all().order_by("due_date")
         if tasks:
             tasks_texts = []
-            for task in await subject.tasks.all().order_by("due_date"):
+            today = datetime.now(timezone.utc)
+            for task in (
+                await subject.tasks.all()
+                .order_by("due_date")
+                .filter(due_date__gte=today)
+            ):
                 solution = await db.solution.filter(
                     student_id=student.pk, subject_task_id=task.pk
                 ).first()
