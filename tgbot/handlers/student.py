@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from aiogram import F, Router
 from aiogram.filters import Command
 from aiogram.types import CallbackQuery, Message
@@ -10,7 +12,7 @@ from tgbot.keyboards.inline.solution_keyboard import solution_keyboard
 from tgbot.misc.database import Database
 from tgbot.misc.storage import Storage
 from tgbot.misc.texts import STUDENT_HELP_TEXT
-from tgbot.misc.utils import create_subject_message
+from tgbot.misc.utils import create_subject_message, gather_upcoming_tasks
 from tgbot.models.models import Student
 
 router = Router()
@@ -47,25 +49,21 @@ async def show_upcoming_tasks(
     message: Message, db: Database, student: Student
 ) -> None:
     subjects = await db.get_student_subjects(student)
+    today = datetime.now(timezone.utc)
     for subject in subjects:
-        subject_text = f"Your tasks for {hbold(subject.name)}:"
-        tasks = await subject.tasks.all().order_by("due_date")
+        tasks = (
+            await subject.tasks.all()
+            .order_by("due_date")
+            .filter(due_date__gte=today)
+        )
         if tasks:
-            tasks_texts = []
-            for task in await subject.tasks.all().order_by("due_date"):
-                solution = await db.solution.filter(
-                    student_id=student.pk, subject_task_id=task.pk
-                ).first()
-                is_done = "✅" if solution else "❌"
-                text = f"* Name: {hbold(task.name)}. Due date: {hbold(task.due_date.strftime('%d/%m/%Y'))}. Is done: {is_done}"
-                if solution:
-                    text += f" Your grade: {hbold(solution.grade)}"
-                tasks_texts.append(text)
-            tasks_text = "\n".join(tasks_texts)
-            await message.answer(subject_text + "\n" + tasks_text)
+            answer_text = await gather_upcoming_tasks(
+                db, subject, tasks, student
+            )
+            await message.answer(answer_text)
         else:
             await message.answer(
-                subject_text + "\nThere are no tasks for this subject."
+                f"There are no tasks for subject {hbold(subject.name)}"
             )
     return None
 
