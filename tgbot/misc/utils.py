@@ -10,7 +10,7 @@ from aiogram.utils.markdown import hbold, hlink
 from loader import bot
 from tgbot.keyboards.inline.task_keyboard import task_keyboard
 from tgbot.misc.database import Database
-from tgbot.models.models import Subject
+from tgbot.models.models import Student, Subject, SubjectTask
 from tgbot.states.states import Task
 
 
@@ -120,6 +120,24 @@ def delete_file(file_path: str):
         logging.error(f"Permission denied: unable to delete {file_path}")
     except OSError as e:
         logging.error(f"Error: {e}")
+
+
+async def gather_upcoming_tasks(
+    db: Database, subject: Subject, tasks: list[SubjectTask], student: Student
+) -> str:
+    subject_text = f"Your tasks for {hbold(subject.name)}:"
+    tasks_texts = []
+    for task in tasks:
+        solution = await db.solution.filter(
+            student_id=student.pk, subject_task_id=task.pk
+        ).first()
+        is_done = "✅" if solution else "❌"
+        text = f"* Name: {hbold(task.name)}. Due date: {hbold(task.due_date.strftime('%d/%m/%Y'))}. Is done: {is_done}"
+        if solution:
+            text += f" Your grade: {hbold(solution.grade)}"
+        tasks_texts.append(text)
+    tasks_text = "\n".join(tasks_texts)
+    return subject_text + "\n" + tasks_text
 
 
 utils = {
