@@ -2,6 +2,7 @@ import asyncio
 import logging
 
 from aiogram import Bot, Dispatcher
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 # from aiogram.utils.callback_answer import CallbackAnswerMiddleware
 from loader import bot, dp
@@ -58,12 +59,19 @@ async def init_database():
     logging.info("Database was inited")
 
 
+async def start_scheduler():
+    scheduler = AsyncIOScheduler()
+    scheduler.start()
+    logging.info("Scheduler was inited")
+
+
 async def on_startup(bot: Bot, dispatcher: Dispatcher) -> None:
     register_all_handlers()
     register_global_middlewares(dispatcher, config)
     await init_database()
     await register_all_commands(bot)
     await on_startup_notify(bot)
+    await start_scheduler()
     logging.info("Bot started.")
 
 
