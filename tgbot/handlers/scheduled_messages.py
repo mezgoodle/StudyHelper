@@ -21,12 +21,15 @@ async def scheduled_notification(bot: Bot, db: Database) -> Message:
                 .order_by("due_date")
                 .filter(due_date__gte=datetime.now(timezone.utc))
             )
-            task_text = "\n".join(
-                f"{task.name}. Due date: {task.due_date.strftime('%d/%m/%Y')}"
-                for task in tasks
+            task_text = (
+                "\n".join(
+                    f"{task.name}. Due date: {task.due_date.strftime('%d/%m/%Y')}"
+                    for task in tasks
+                )
+                or "No upcoming tasks"
             )
             await bot.send_message(
                 chat_id=student.user_id,
-                text=f"Tasks for subject {hbold(subject.name)}\n" + task_text,
+                text=f"Tasks for subject {hbold(subject.name)}:\n" + task_text,
             )
     return
