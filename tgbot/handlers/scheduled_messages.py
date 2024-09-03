@@ -1,13 +1,12 @@
 from datetime import datetime, timezone
 
 from aiogram import Bot
-from aiogram.types import Message
 from aiogram.utils.markdown import hbold
 
 from tgbot.misc.database import Database
 
 
-async def scheduled_notification(bot: Bot, db: Database) -> Message:
+async def scheduled_notification(bot: Bot, db: Database) -> None:
     students = await db.get_students()
 
     for student in students:
@@ -32,4 +31,4 @@ async def scheduled_notification(bot: Bot, db: Database) -> Message:
                 chat_id=student.user_id,
                 text=f"Tasks for subject {hbold(subject.name)}:\n" + task_text,
             )
-    return
+    return None
