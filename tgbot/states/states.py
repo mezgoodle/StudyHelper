@@ -20,3 +20,7 @@ class Solution(StatesGroup):
     task_id = State()
     student_id = State()
     file_link = State()
+
+
+class Communication(StatesGroup):
+    wait_for_message = State()
