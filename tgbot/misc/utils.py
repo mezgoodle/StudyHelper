@@ -144,7 +144,7 @@ async def gather_upcoming_tasks(
 async def ask_teacher(
     message: Message, payload: dict, db: Database, *args, **kwargs
 ) -> str:
-    text = "To ask a teacher, click a button below"
+    text = "To write a message to the teacher, click a button below:"
     subject = await db.get_subject(payload.get("id"))
     teacher = await subject.teacher
     keyboard = await support_keyboard(teacher_id=teacher.user_id)

@@ -20,16 +20,19 @@ async def send_to_teacher(
     user_id = callback_data.user_id
     await state.set_state(Communication.wait_for_message)
     await state.update_data({"second_id": user_id})
-    return await callback.message.answer("Write your message to the teacher")
+    return await callback.message.answer(
+        "Write your message to the teacher. You can attach a file."
+    )
 
 
 @router.message(Communication.wait_for_message)
 async def write_message(message: Message, state: FSMContext) -> None:
     data = await state.get_data()
     second_id = data.get("second_id")
+    username = message.from_user.username
     await bot.send_message(
         second_id,
-        "You have a new message. Answer by clicking on the button below.",
+        f"You have a new message from @{username}. Answer by clicking on the button below:",
     )
     keyboard = await support_keyboard(user_id=message.from_user.id)
     await message.copy_to(second_id, reply_markup=keyboard)
