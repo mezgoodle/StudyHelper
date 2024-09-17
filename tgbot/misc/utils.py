@@ -147,9 +147,7 @@ async def ask_teacher(
     text = "To ask a teacher, click a button below"
     subject = await db.get_subject(payload.get("id"))
     teacher = await subject.teacher
-    keyboard = await support_keyboard(
-        messages="one", teacher_id=teacher.user_id
-    )
+    keyboard = await support_keyboard(teacher_id=teacher.user_id)
     return await message.answer(text, reply_markup=keyboard)
 
 

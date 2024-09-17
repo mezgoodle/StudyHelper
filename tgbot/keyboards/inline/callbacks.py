@@ -13,9 +13,7 @@ class SolutionCallbackFactory(CallbackData, prefix="solution"):
 
 
 class SupportCallbackFactory(CallbackData, prefix="support"):
-    messages: str
     user_id: int
-    as_user: bool
 
 
 class CancelSupportCallbackFactory(CallbackData, prefix="cancel_support"):

@@ -11,7 +11,7 @@ router = Router()
 dp.include_router(router)
 
 
-@router.callback_query(SupportCallbackFactory.filter(F.messages == "one"))
+@router.callback_query(SupportCallbackFactory.filter())
 async def send_to_teacher(
     callback: CallbackQuery,
     callback_data: SupportCallbackFactory,
@@ -20,7 +20,7 @@ async def send_to_teacher(
     user_id = callback_data.user_id
     await state.set_state(Communication.wait_for_message)
     await state.update_data({"second_id": user_id})
-    return await callback.message.answer("Write your message")
+    return await callback.message.answer("Write your message to the teacher")
 
 
 @router.message(Communication.wait_for_message)
@@ -28,11 +28,10 @@ async def write_message(message: Message, state: FSMContext) -> None:
     data = await state.get_data()
     second_id = data.get("second_id")
     await bot.send_message(
-        second_id, "You have a new message. Answer by clicking on it."
+        second_id,
+        "You have a new message. Answer by clicking on the button below.",
     )
-    keyboard = await support_keyboard(
-        messages="one", user_id=message.from_user.id
-    )
+    keyboard = await support_keyboard(user_id=message.from_user.id)
     await message.copy_to(second_id, reply_markup=keyboard)
     await state.clear()
-    return await message.answer("Your message has been sent")
+    return await message.answer("Your message has been sent successfully!")
