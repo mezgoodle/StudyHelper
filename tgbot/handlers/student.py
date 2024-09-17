@@ -37,6 +37,7 @@ async def get_subjects(
             [
                 {"text": "Quit from subject", "name": "quit_subject"},
                 {"text": "See tasks", "name": "see_tasks"},
+                {"text": "Write a message to teacher", "name": "ask_teacher"},
             ],
         )
         await message.answer("Here are your subjects:")

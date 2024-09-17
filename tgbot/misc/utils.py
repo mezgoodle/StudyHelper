@@ -8,6 +8,7 @@ from aiogram.utils.deep_linking import create_start_link
 from aiogram.utils.markdown import hbold, hlink
 
 from loader import bot
+from tgbot.keyboards.inline.support_keyboard import support_keyboard
 from tgbot.keyboards.inline.task_keyboard import task_keyboard
 from tgbot.misc.database import Database
 from tgbot.models.models import Student, Subject, SubjectTask
@@ -140,9 +141,22 @@ async def gather_upcoming_tasks(
     return subject_text + "\n" + tasks_text
 
 
+async def ask_teacher(
+    message: Message, payload: dict, db: Database, *args, **kwargs
+) -> str:
+    text = "To ask a teacher, click a button below"
+    subject = await db.get_subject(payload.get("id"))
+    teacher = await subject.teacher
+    keyboard = await support_keyboard(
+        messages="one", teacher_id=teacher.user_id
+    )
+    return await message.answer(text, reply_markup=keyboard)
+
+
 utils = {
     "add_subject": add_student_to_subject,
     "quit_subject": quit_student_to_subject,
     "add_task": add_task,
     "see_tasks": see_tasks,
+    "ask_teacher": ask_teacher,
 }
