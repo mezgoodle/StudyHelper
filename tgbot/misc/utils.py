@@ -145,10 +145,15 @@ async def ask_teacher(
     message: Message, payload: dict, db: Database, *args, **kwargs
 ) -> str:
     text = "To write a message to the teacher, click a button below:"
-    subject = await db.get_subject(payload.get("id"))
-    teacher = await subject.teacher
-    keyboard = await support_keyboard(teacher_id=teacher.user_id)
-    return await message.answer(text, reply_markup=keyboard)
+    if (subject := await db.get_subject(payload.get("id"))) and (
+        teacher := await subject.teacher
+    ):
+        keyboard = await support_keyboard(teacher_id=teacher.user_id)
+        return await message.answer(text, reply_markup=keyboard)
+    logging.error("Subject or teacher not found. Can't send message.")
+    return await message.answer(
+        "Subject or teacher not found. Can't send message."
+    )
 
 
 utils = {
