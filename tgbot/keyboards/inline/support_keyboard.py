@@ -7,12 +7,8 @@ from tgbot.keyboards.inline.callbacks import SupportCallbackFactory
 async def support_keyboard(
     teacher_id: int | None = None, user_id: int | None = None
 ) -> InlineKeyboardMarkup:
-    if user_id:
-        contact_id = user_id
-        text = "Answer to student"
-    else:
-        contact_id = teacher_id
-        text = "Write your message"
+    contact_id = user_id or teacher_id
+    text = "Write your message"
     keyboard = InlineKeyboardBuilder()
     keyboard.add(
         InlineKeyboardButton(
