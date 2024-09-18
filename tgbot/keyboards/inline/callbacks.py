@@ -10,3 +10,7 @@ class TaskCallbackFactory(CallbackData, prefix="task"):
 class SolutionCallbackFactory(CallbackData, prefix="solution"):
     solution_id: int
     grade: int
+
+
+class SupportCallbackFactory(CallbackData, prefix="support"):
+    user_id: int
