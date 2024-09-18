@@ -14,7 +14,3 @@ class SolutionCallbackFactory(CallbackData, prefix="solution"):
 
 class SupportCallbackFactory(CallbackData, prefix="support"):
     user_id: int
-
-
-class CancelSupportCallbackFactory(CallbackData, prefix="cancel_support"):
-    user_id: int

@@ -1,4 +1,4 @@
-from aiogram import F, Router
+from aiogram import Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 
@@ -21,7 +21,7 @@ async def send_to_teacher(
     await state.set_state(Communication.wait_for_message)
     await state.update_data({"second_id": user_id})
     return await callback.message.answer(
-        "Write your message to the teacher. You can attach a file."
+        "Write your message. You can attach a file."
     )
 
 
