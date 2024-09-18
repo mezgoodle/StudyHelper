@@ -30,9 +30,10 @@ async def write_message(message: Message, state: FSMContext) -> None:
     data = await state.get_data()
     second_id = data.get("second_id")
     username = message.from_user.username
+    full_name = message.from_user.full_name
     await bot.send_message(
         second_id,
-        f"You have a new message from @{username}. Answer by clicking on the button below:",
+        f"You have a new message from @{username}({full_name}). Answer by clicking on the button below:",
     )
     keyboard = await support_keyboard(user_id=message.from_user.id)
     await message.copy_to(second_id, reply_markup=keyboard)
