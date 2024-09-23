@@ -1,10 +1,16 @@
+import io
+import os
 from json import loads
 
+import pandas as pd
+import seaborn as sns
 from aiogram import Router
 from aiogram.filters import Command, CommandObject, CommandStart
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, ReplyKeyboardRemove
+from aiogram.types.input_file import FSInputFile
 from aiogram.utils.deep_linking import decode_payload
+from matplotlib import pyplot as plt
 
 from loader import dp
 from tgbot.misc.database import Database
@@ -75,3 +81,23 @@ async def help_handler(message: Message) -> Message:
     return await message.answer(
         "Available commands: /register_student, /register_teacher\nAdministator: @sylvenis"
     )
+
+
+@router.message(Command("charts"))
+async def charts_handler(message: Message) -> Message:
+    plt.plot([1, 2, 3], [4, 5, 6])
+    plt.title("Мій графік")
+
+    # Зберігаємо графік у BytesIO
+    buffer = io.BytesIO()
+    plt.savefig(buffer, format="png")
+    buffer.seek(0)
+    temp_file = "temp.png"
+    with open(temp_file, "wb") as f:
+        f.write(buffer.read())
+
+    file = FSInputFile(temp_file, filename="my_graph.png")
+    try:
+        return await message.answer_photo(file)
+    finally:
+        os.remove(temp_file)
