@@ -91,6 +91,14 @@ class Database:
             .prefetch_related("student")
         )
 
+    async def get_stats_by_subject(self, subject: Subject) -> dict[str, int]:
+        tasks = await self.subjecttask.filter(subject=subject).all()
+        stats = {}
+        for task in tasks:
+            solutions = await self.solution.filter(subject_task=task).count()
+            stats[task.name] = solutions
+        return stats
+
     async def get_student_solution(
         self, student_id: int, subject_task_id: int
     ) -> Solution | None:
