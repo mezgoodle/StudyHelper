@@ -91,12 +91,15 @@ class Database:
             .prefetch_related("student")
         )
 
-    async def get_stats_by_subject(self, subject: Subject) -> dict[str, int]:
+    async def get_count_solutions_by_subject(
+        self, subject: Subject
+    ) -> dict[str, int]:
+        students = await self.student.filter(subjects=subject).count()
         tasks = await self.subjecttask.filter(subject=subject).all()
         stats = {}
         for task in tasks:
             solutions = await self.solution.filter(subject_task=task).count()
-            stats[task.name] = solutions
+            stats[task.name] = solutions / students
         return stats
 
     async def get_student_solution(

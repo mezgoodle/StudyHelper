@@ -8,7 +8,7 @@ from aiogram.types import FSInputFile, Message
 
 async def send_chart(
     message: Message,
-    data,
+    data: dict,
     x_legend: str,
     y_legend: str,
     title: str | None = None,
@@ -19,7 +19,6 @@ async def send_chart(
             y_legend: tuple(data[y_legend]),
         }
     )
-    print(sample_data)
     ax = sns.barplot(x=x_legend, y=y_legend, data=sample_data)
     ax.title.set_text(title)
     buffer = io.BytesIO()
@@ -29,8 +28,7 @@ async def send_chart(
     temp_file = "temp.png"
     with open(temp_file, "wb") as f:
         f.write(buffer.read())
-
-    file = FSInputFile(temp_file, filename="my_graph.png")
+    file = FSInputFile(temp_file)
     try:
         return await message.answer_photo(file)
     finally:
