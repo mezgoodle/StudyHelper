@@ -105,6 +105,12 @@ class Database:
                 stats[task.name] = solutions / students
         return stats
 
+    async def get_grades_by_subject(self, subject: Subject) -> list[int]:
+        solutions = await self.solution.filter(
+            subject_task__subject=subject
+        ).all()
+        return [solution.grade for solution in solutions]
+
     async def get_student_solution(
         self, student_id: int, subject_task_id: int
     ) -> Solution | None:

@@ -13,7 +13,6 @@ from tgbot.keyboards.inline.callbacks import (
 )
 from tgbot.keyboards.inline.solution_keyboard import solution_keyboard
 from tgbot.keyboards.reply.options_keyboard import options_keyboard
-from tgbot.misc.charts import send_chart
 from tgbot.misc.database import Database
 from tgbot.misc.storage import Storage
 from tgbot.misc.texts import TEACHER_HELP_TEXT

@@ -10,7 +10,7 @@ from aiogram.utils.markdown import hbold, hlink
 from loader import bot
 from tgbot.keyboards.inline.support_keyboard import support_keyboard
 from tgbot.keyboards.inline.task_keyboard import task_keyboard
-from tgbot.misc.charts import send_chart
+from tgbot.misc.charts import send_chart, send_chart_hist
 from tgbot.misc.database import Database
 from tgbot.models.models import Student, Subject, SubjectTask
 from tgbot.states.states import Task
@@ -162,14 +162,17 @@ async def subject_stats(
 ) -> str:
     if subject := await db.get_subject(payload.get("id")):
         subject_stats = await db.get_count_solutions_by_subject(subject)
+        grades = await db.get_grades_by_subject(subject)
         stats = {}
-        if not subject_stats.values():
+        if not grades:
             return await message.answer(
                 f"Stats for subject {hbold(subject.name)}: No data"
             )
         stats["Tasks names"] = subject_stats.keys()
         stats["Solutions"] = subject_stats.values()
+        grades = {"Grades": grades}
         await message.answer(f"Stats for subject {hbold(subject.name)}:")
+        await send_chart_hist(message, grades, "Grades")
         return await send_chart(
             message,
             stats,
