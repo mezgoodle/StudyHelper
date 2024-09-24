@@ -149,6 +149,7 @@ async def get_subjects(
                 {"text": "Invite students", "name": "add_subject"},
                 {"text": "Add task", "name": "add_task"},
                 {"text": "See tasks", "name": "see_tasks"},
+                {"text": "Show stats", "name": "subject_stats"},
             ],
         )
         await message.answer("Here are your subjects:")
@@ -230,28 +231,3 @@ async def review_solution(
         )
         return await callback.answer("Solution was reviewed")
     return await callback.answer("Error was occurred")
-
-
-@router.message(Command("charts"))
-async def charts_handler(
-    message: Message, db: Database, teacher: Teacher
-) -> Message:
-    subjects = await db.get_subjects_by_teacher_id(teacher.id)
-    for subject in subjects:
-        subject_stats = await db.get_count_solutions_by_subject(subject)
-        stats = {}
-        if not subject_stats.values():
-            await message.answer(
-                f"Stats for subject {hbold(subject.name)}: No data"
-            )
-            continue
-        stats["Tasks names"] = subject_stats.keys()
-        stats["Solutions"] = subject_stats.values()
-        await message.answer(f"Stats for subject {hbold(subject.name)}:")
-        await send_chart(
-            message,
-            stats,
-            "Tasks names",
-            "Solutions",
-            "Number of solutions for tasks",
-        )
