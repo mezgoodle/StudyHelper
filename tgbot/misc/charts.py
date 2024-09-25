@@ -44,6 +44,7 @@ async def send_chart(
 def prepare_hist_chart(data: dict, x_legend: str, title: str):
     sample_data = pd.DataFrame({x_legend: tuple(data[x_legend])})
     plt.clf()
+    plt.xticks([1, 2, 3, 4, 5])
     ax = sns.histplot(x=x_legend, data=sample_data)
     ax.title.set_text(title)
     return ax
