@@ -91,7 +91,7 @@ class Database:
             .prefetch_related("student")
         )
 
-    async def get_count_solutions_by_subject(
+    async def get_percentage_solutions_by_subject(
         self, subject: Subject
     ) -> dict[str, int]:
         students = await self.student.filter(subjects=subject).count()

@@ -166,7 +166,7 @@ async def get_subject_statistics(
         return None, None, None
 
     try:
-        subject_stats = await db.get_count_solutions_by_subject(subject)
+        subject_stats = await db.get_percentage_solutions_by_subject(subject)
         grades = await db.get_grades_by_subject(subject)
         return subject, subject_stats, grades
     except Exception as e:
