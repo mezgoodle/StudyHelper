@@ -1,6 +1,7 @@
 import io
 import logging
 import os
+import tempfile
 from enum import Enum
 
 import pandas as pd
@@ -33,7 +34,10 @@ async def send_chart(
         fig = ax.get_figure()
         fig.savefig(buffer, format="png")
         buffer.seek(0)
-        temp_file = "temp.png"
+        plt.close(fig)
+        temp_file = tempfile.NamedTemporaryFile(
+            suffix=".png", delete=False
+        ).name
         with open(temp_file, "wb") as f:
             f.write(buffer.read())
         file = FSInputFile(temp_file)
@@ -51,10 +55,10 @@ async def send_chart(
 
 def prepare_hist_chart(data: dict, x_legend: str, title: str):
     sample_data = pd.DataFrame({x_legend: tuple(data[x_legend])})
-    plt.clf()
-    plt.xticks([1, 2, 3, 4, 5])
-    ax = sns.histplot(x=x_legend, data=sample_data)
-    ax.title.set_text(title)
+    _, ax = plt.subplots()
+    ax.set_xticks([1, 2, 3, 4, 5])
+    sns.histplot(x=x_legend, data=sample_data, ax=ax)
+    ax.set_title(title)
     return ax
 
 
@@ -65,7 +69,7 @@ def prepare_bar_chart(data: dict, x_legend: str, y_legend: str, title: str):
             y_legend: tuple(data[y_legend]),
         }
     )
-    plt.clf()
-    ax = sns.barplot(x=x_legend, y=y_legend, data=sample_data)
-    ax.title.set_text(title)
+    _, ax = plt.subplots()
+    sns.barplot(x=x_legend, y=y_legend, data=sample_data, ax=ax)
+    ax.set_title(title)
     return ax

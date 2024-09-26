@@ -175,6 +175,8 @@ async def get_subject_statistics(
 
 
 async def prepare_chart_data(subject_stats, grades):
+    if not subject_stats or not grades:
+        raise ValueError("Subject stats or grades not found.")
     stats = {
         "Tasks names": subject_stats.keys(),
         "Solutions": subject_stats.values(),
