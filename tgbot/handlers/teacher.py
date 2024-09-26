@@ -148,6 +148,7 @@ async def get_subjects(
                 {"text": "Invite students", "name": "add_subject"},
                 {"text": "Add task", "name": "add_task"},
                 {"text": "See tasks", "name": "see_tasks"},
+                {"text": "Show stats", "name": "subject_stats"},
             ],
         )
         await message.answer("Here are your subjects:")

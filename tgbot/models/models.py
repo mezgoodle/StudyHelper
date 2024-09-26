@@ -77,7 +77,7 @@ class Solution(TimedBaseModel):
     subject_task: fields.ForeignKeyRelation[SubjectTask] = (
         fields.ForeignKeyField(
             "models.SubjectTask",
-            related_name="students",
+            related_name="solutions",
             description="Task subject",
             on_delete=fields.OnDelete.CASCADE,
         )

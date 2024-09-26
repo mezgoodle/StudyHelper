@@ -91,6 +91,26 @@ class Database:
             .prefetch_related("student")
         )
 
+    async def get_percentage_solutions_by_subject(
+        self, subject: Subject
+    ) -> dict[str, int]:
+        students = await self.student.filter(subjects=subject).count()
+        tasks = await self.subjecttask.filter(subject=subject).all()
+        stats = {}
+        if students:
+            for task in tasks:
+                solutions = await self.solution.filter(
+                    subject_task=task
+                ).count()
+                stats[task.name] = solutions / students
+        return stats
+
+    async def get_grades_by_subject(self, subject: Subject) -> list[int]:
+        solutions = await self.solution.filter(
+            subject_task__subject=subject
+        ).all()
+        return [solution.grade for solution in solutions]
+
     async def get_student_solution(
         self, student_id: int, subject_task_id: int
     ) -> Solution | None:

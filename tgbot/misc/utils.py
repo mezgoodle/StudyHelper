@@ -10,6 +10,7 @@ from aiogram.utils.markdown import hbold, hlink
 from loader import bot
 from tgbot.keyboards.inline.support_keyboard import support_keyboard
 from tgbot.keyboards.inline.task_keyboard import task_keyboard
+from tgbot.misc.charts import ChartType, send_chart
 from tgbot.misc.database import Database
 from tgbot.models.models import Student, Subject, SubjectTask
 from tgbot.states.states import Task
@@ -156,10 +157,70 @@ async def ask_teacher(
     )
 
 
+async def get_subject_statistics(
+    db: Database, subject_id: int
+) -> tuple[Subject | None, dict | None, dict | None]:
+    subject = await db.get_subject(subject_id)
+    if not subject:
+        logging.error(f"Subject with id {subject_id} not found")
+        return None, None, None
+
+    try:
+        subject_stats = await db.get_percentage_solutions_by_subject(subject)
+        grades = await db.get_grades_by_subject(subject)
+        return subject, subject_stats, grades
+    except Exception as e:
+        logging.error(f"Error fetching subject statistics: {e}")
+        return subject, None, None
+
+
+async def prepare_chart_data(subject_stats, grades):
+    if not subject_stats or not grades:
+        raise ValueError("Subject stats or grades not found.")
+    stats = {
+        "Tasks names": subject_stats.keys(),
+        "Solutions": subject_stats.values(),
+    }
+    grades_data = {"Grades": grades}
+    return stats, grades_data
+
+
+async def subject_stats(
+    message: Message, payload: dict, db: Database, *args, **kwargs
+) -> str:
+    subject, subject_stats, grades = await get_subject_statistics(
+        db, payload.get("id")
+    )
+    if not subject:
+        return await message.answer("Subject not found.")
+    if not grades:
+        return await message.answer(
+            f"Stats for subject {hbold(subject.name)}: No data"
+        )
+    stats, grades_data = await prepare_chart_data(subject_stats, grades)
+    await message.answer(f"Stats for subject {hbold(subject.name)}:")
+    await send_chart(
+        message=message,
+        data=grades_data,
+        x_legend="Grades",
+        title="Grades",
+        chart_type=ChartType.HIST,
+    )
+    return await send_chart(
+        message=message,
+        data=stats,
+        x_legend="Tasks names",
+        y_legend="Solutions",
+        title="Number of solutions for tasks",
+        chart_type=ChartType.BAR,
+    )
+
+
 utils = {
     "add_subject": add_student_to_subject,
     "quit_subject": quit_student_to_subject,
     "add_task": add_task,
     "see_tasks": see_tasks,
     "ask_teacher": ask_teacher,
+    "subject_stats": subject_stats,
 }
