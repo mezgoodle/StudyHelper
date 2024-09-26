@@ -1,4 +1,5 @@
 import io
+import logging
 import os
 from enum import Enum
 
@@ -27,14 +28,21 @@ async def send_chart(
         ax = prepare_hist_chart(data, x_legend, title)
     else:
         raise ValueError(f"Unknown chart type: {chart_type}")
-    buffer = io.BytesIO()
-    fig = ax.get_figure()
-    fig.savefig(buffer, format="png")
-    buffer.seek(0)
-    temp_file = "temp.png"
-    with open(temp_file, "wb") as f:
-        f.write(buffer.read())
-    file = FSInputFile(temp_file)
+    try:
+        buffer = io.BytesIO()
+        fig = ax.get_figure()
+        fig.savefig(buffer, format="png")
+        buffer.seek(0)
+        temp_file = "temp.png"
+        with open(temp_file, "wb") as f:
+            f.write(buffer.read())
+        file = FSInputFile(temp_file)
+    except ValueError as ve:
+        logging.error(ve)
+        return await message.answer("Error creating chart. Try again later.")
+    except Exception as e:
+        logging.error(e)
+        return await message.answer("Unexpected error. Try again later.")
     try:
         return await message.answer_photo(file)
     finally:
