@@ -18,4 +18,4 @@
 
 ## Information
 
-All the need information about the project can be found in the article on DevTo.
+All the need information about the project can be found in the [article](https://dev.to/mezgoodle/studyhelper-my-new-pet-projecttelegram-bot-3f41) on DevTo.
