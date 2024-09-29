@@ -206,6 +206,7 @@ async def review_solution(
     callback_data: SolutionCallbackFactory,
     db: Database,
     bot: Bot,
+    storage: Storage,
 ) -> Message:
     if new_solution := await db.update_solution_grade(
         callback_data.solution_id,
@@ -215,7 +216,7 @@ async def review_solution(
             [
                 f"{hbold('Student')}: {new_solution.student.name}",
                 f"{hbold('Grade')}: {new_solution.grade}",
-                f"{hbold('File link')}: {new_solution.file_link}",
+                f"{hbold('File link')}: {hlink('Click here', storage.create_presigned_url(new_solution.file_link))}",
             ]
         )
         await callback.message.edit_text(

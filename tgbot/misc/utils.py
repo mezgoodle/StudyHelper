@@ -21,7 +21,7 @@ async def create_subject_message(
     methods: list[dict[str, str]],
 ) -> str:
     rows = []
-    for subject in subjects:
+    for index, subject in enumerate(subjects, 1):
         links = []
         for method in methods:
             links.append(
@@ -30,7 +30,7 @@ async def create_subject_message(
                     await create_link(subject.id, method.get("name")),
                 )
             )
-        rows.append(f"{subject.id}. {subject.name}. {', '.join(links)}")
+        rows.append(f"{index}. {subject.name}. {', '.join(links)}")
 
     return "\n".join(rows)
 
